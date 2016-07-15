@@ -1,0 +1,2 @@
+require './journeys'
+run JourneysApp

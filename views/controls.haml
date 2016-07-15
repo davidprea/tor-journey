@@ -1,0 +1,29 @@
+
+:javascript
+	$(function() {
+		$( "#tabs" ).tabs();
+	});
+
+#tabs
+	%ul
+		%li
+			%a{ :href => '#settings'}
+				-#%img#gear_tab_icon{ :src => '/images/gear.png' }
+				Map
+		%li
+			%a{ :href => '#journey' }
+				Journey
+		-#%li
+		-#	%a{ :href => '#art' }
+		-#		Art
+		-#%li
+		-#	%a{ :href => '#tag' }
+		-#		Tag
+	#settings
+		= partial :map, :layout => false
+
+	#journey
+		=partial :journey, :layout => false
+
+
+

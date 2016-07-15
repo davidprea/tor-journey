@@ -1,0 +1,333 @@
+
+@font-face { 
+	font-family: 'alois';
+	src: url(/fonts/alois.ttf);
+}
+
+tra
+body {
+	font-family:'alois';
+}
+
+#map {
+	overflow:auto;
+}
+
+#overlay{
+	z-index:-1;
+	width:100%;
+	height:100%;
+	background-color:transparent;
+}
+
+#pdf-canvas {
+	position: absolute;
+	left:0px;
+	top:0px;
+	z-index:2;
+}
+
+a.delete-anchor {
+	font-size:10;
+	color:red;
+}
+
+#control_panel{
+	position:fixed;
+	left:25px;
+	top:25px;
+	z-index:10;
+	background: transparent
+}
+
+.pdf_wrapper {
+	border-style:solid;
+	margin-top:3px;
+	border-width:1px;
+	border-color:lightgray;
+	background:white;
+	background-opacity:80%;
+	opacity:80%;
+	padding:2px;
+	border-radius:3px;
+	box-shadow: 1px 1px 3px black;
+	font-family:Helvetica;
+	font-style:italic;
+}
+
+#settings {
+	max-width:320px;
+}
+
+
+#tabs { 
+	padding: 0px; 
+	background: none; 
+	border-width: 0px; 
+	font-style:bold;
+	font-size:12px;
+	outline:none;
+	font-family:'alois';
+} 
+#tabs .ui-tabs-nav { 
+	padding-left: 0px; 
+	background: transparent; 
+	border-width: 0px 0px 1px 0px; 
+	-moz-border-radius: 0px; 
+	-webkit-border-radius: 0px; 
+	border-radius: 0px; 
+	padding:0px;
+} 
+
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+	padding:2px 3px 2px 3px;
+	font-size: 12px;
+}
+
+#tabs .ui-tabs-nav .ui-state-default :focus {
+	outline:none;
+}
+
+#tabs .ui-tabs-nav .ui-state-default { 
+	background:rgba(1,1,1,0.5); 
+} 
+
+#tabs .ui-tabs-nav .ui-state-default a { 
+	color:white; 
+} 
+
+#tabs .ui-tabs-nav .ui-state-active { 
+	background:rgba(255,255,255,0.8); 
+	color:black;
+	outline:none;
+} 
+
+#tabs .ui-tabs-nav .ui-state-active a { 
+	color:black; 
+} 
+
+#selected_description {
+	max-width:200;
+}
+
+form > ul {
+	list-style-type:none;
+}
+
+#region_icon {
+	width: 36;
+	height:36;
+	margin:0 auto;
+}
+
+
+
+#map_key {
+	width:175;
+	border:1px solid saddlebrown;
+}
+
+#gear_tab_icon {
+	height:14;
+	padding-bottom:1;
+}
+
+li, li > label {
+	list-style:none;
+	font-size:15px;
+	cursor:pointer;
+	padding-left: 5px;
+	color:saddlebrown;
+}
+
+#tabs .ui-tabs-panel { 
+	background: url('/images/parchment.jpg');
+	opacity:95%;
+	border: solid 1px darkgray;
+	box-shadow: 2px 2px 5px black;
+	padding:5px 5px 4px 4px;
+}
+
+#new_pe_description {
+	width:300px;
+	height:200px;
+	margin-bottom:5px;
+}
+
+#submit_button {
+	float:right;
+	margin-right:10px;
+	margin-bottom:8px;
+}
+
+#pe_sub_type {
+	display:none;
+}
+
+#location_list {
+	max-height:200px;
+	overflow:auto;
+	width:200px;
+	background:white;
+	border:1px saddlebrown solid;
+	box-shadow: 1px 1px 2px black inset;
+}
+
+#search_field {
+	width:150px;
+	margin-left:25px;
+	margin-bottom:8px;
+}
+
+.me_table {
+	font-size:12px;
+}
+
+.me_table_item {
+	text-align:center;
+	margin:2px 5px 2px 5px;
+}
+
+#current_icon_wrapper {
+	width:53px;
+	padding:0;
+	margin:0 auto;
+}
+
+#current_region_icon {
+	height:53px;
+}
+
+#coordinates {
+	float:right;
+	margin-right:3px;
+}
+
+#info {
+	width:200px;
+	display:none;
+}
+
+#good_road_slider {
+	width: 70%;
+}
+
+#good_road_percent {
+	width: 25px;
+}
+
+#browse, #create, #tag {
+	display:none;
+}
+
+#journey {
+	max-height:600px;
+	max-width:250px;
+	overflow:auto;
+}
+
+
+.journey_header {
+	text-align:center;
+}
+
+.journey_title {
+	margin-top:5px;
+	width:100%;
+	text-align:center;
+	font-size: 14;
+}
+
+.journey_leg_div {
+	margin:5px, 10px, 5px, 10px;
+	padding-top:4px;
+	border-top:1px saddlebrown solid;
+	text-align:center;
+}
+
+.journey_summary_data_div {
+	width:100%;
+	text-align:center;
+	font-size:12;
+}
+
+.journey_summary_value {
+	color:darkred;
+}
+
+.journey_warning {
+	width: 175px;
+}
+
+.journey_leg_value {
+	color:darkred;
+}
+
+p {
+	line-height:10%;
+	height:1px;
+	-webkit-margin-before:0px;
+	-webkit-margin-after:0px;
+}
+
+text {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;	
+}
+
+.hex_cell {
+	cursor:pointer;
+}
+
+.cell_date {
+	stroke:saddlebrown;
+	cursor:pointer;
+}
+
+.fileload {
+	width: auto;
+	margin-left: 20px;
+}
+
+.lightbox-image {
+	max-width: 40px;
+	max-height: 40px;
+}
+
+.lightbox-div {
+}
+
+.lightbox-div a {
+	text-decoration: none;
+}
+
+p {
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+
+
+#progress-bar {
+	width:300px;
+	height:20px;
+	background-color:red;
+	margin: 0 auto;
+	position:relative;
+	top:200px;
+	z-index:1000;
+}
+
+
+.instructions ol, li {
+	font-size:12;
+	font-color:saddlebrown;
+	list-style-type:decimal;
+	list-style-position:inside;
+	padding-left: 5px;
+}
+

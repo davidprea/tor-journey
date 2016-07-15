@@ -1,0 +1,44 @@
+:javascript
+	$(function() {
+		$( "#zoom_slider" ).slider({ 
+			min: 1, 
+			max: 3,
+			step:0.05,
+			slide: function( event, ui ) {
+				$("#zoom_info").text(Math.round(ui.value * 100) + "%");
+			},			
+			change: function( event, ui ) {
+				setScale( ui.value );
+			}
+		});
+	});
+
+-#%fieldset
+-#	%legend
+-#		Journey End Point Rules
+-#	-["Count First Selected Cell", "Don't Count First Selected Cell", "First and Last Cells Each Count for Half"].each_with_index do | label, index |
+-#		%input{:type=>'radio', :onchange => 'computeJourney()', :name=>"first_cell_rule", :id=>"first_cell_rule_#{index}", :checked=>(index == 0) }
+-#			=label
+-#		%p
+-#%input{ :type => 'checkbox', :id => 'toggle_grid', :onchange => 'toggleGrid(this)' }
+-#%label{ :for => 'toggle_grid' }
+-#	Draw Grid
+-#%p
+%fieldset
+	%legend Map
+	-["Eriador", "Wilderland", "Mordor", "Rohan and Gondor"].each_with_index do |name,index| 
+		%input{ :type => 'radio', :checked => (index==0), :onchange => 'changeMap(this)', :name => 'map', :map_name => name.gsub(/[-\s]/,'_').downcase, :id => "#{name.gsub(/[-\s]/,'_').downcase}_select" }
+		=name
+		-#%input.fileload{ :type => 'file', :map_name => name.gsub(/[-\s]/,'_').downcase, :multiple => false, :onchange => "load_map(this)" }
+		%p
+
+-#%fieldset
+-#	%legend
+-#		Instructions
+-#	%div.instructions
+-#		%ol
+-#			%li Convert your official maps to JPG format.<br>
+-#			%li Use "Browse..." buttons to load those JPGs.<br>
+-#			%li	Use radio buttons to toggle between regions.<br>
+-#		(Sorry, due to copyright the maps cannot be loaded automatically.)
+
