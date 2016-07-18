@@ -38,7 +38,8 @@ var clearSel = function( stringName ) {
 var selectionAsString = function() {
 	var result = "";
 	getSelectedCells().each( function(d) {
-		result += ";" + d.q + "," + d.r;
+		var cell = d3.select(this);
+		result += ";" + cell.attr("q") + "," + cell.attr("r");
 	})
 	return result.substring(1,result.length);
 }
