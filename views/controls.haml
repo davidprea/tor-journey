@@ -7,23 +7,37 @@
 #tabs
 	%ul
 		%li
-			%a{ :href => '#settings'}
-				-#%img#gear_tab_icon{ :src => '/images/gear.png' }
+			%a{ :href => '#map'}
 				Map
 		%li
 			%a{ :href => '#journey' }
 				Journey
+		%li
+			%a{ :href => '#cellinfo'}
+				Cell
+		%li
+			%a{ :href => '#settings'}
+				%img#gear_tab_icon{ :src => '/images/gear.png' }
+
 		-#%li
 		-#	%a{ :href => '#art' }
 		-#		Art
 		-#%li
 		-#	%a{ :href => '#tag' }
 		-#		Tag
-	#settings
+	#map
 		= partial :map, :layout => false
 
 	#journey
 		=partial :journey, :layout => false
+	
+	#cellinfo
+		=partial :cellinfo, :layout => false
+
+	#settings
+		=partial :settings, :layout => false
+
+
 
 
 

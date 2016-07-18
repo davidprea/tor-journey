@@ -50,16 +50,11 @@ function findRegionByName( stringName ) {
 	return null;
 }
 
-var highlightRegionName = function( stringName ) {
-	region = findRegionByName(stringName);
-	highlightRegion( region );
-}
 
 function highlightRegion( region ) {
 	revertAllCells(); // need to write this
 	for(var i=0;i<region.cells.length;i++) {
 		cell = region.cells[i];
-		var selector = selectorForCoords( cell.q, cell.r );
-		selectCells( d3.select(selector) );
+		selectCells( selectionForCoords( cell.q, cell.r ) );
 	}
 }
