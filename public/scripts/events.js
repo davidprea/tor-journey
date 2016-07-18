@@ -76,15 +76,11 @@ function mouseUp( d ) {
 
 function changeMap( radioButton ) {
 	selection = getSelectedCells();
-	console.log( "count: " + selection.size() );
+	console.log( SELECTED_CELLS );
 	CURRENT_MAP = radioButton.getAttribute( "map_name") + ".jpg";
 	displayCurrentMap();
-	selection.each( function(d) {
-//		console.log( d.q + ", " + d.r );
-		cell = d3.select(this)
-		changeSelectionState( cellAtCoords( cell.attr("q"), cell.attr("r") ), true );
-//		cell = cellAtCoords( d.q, d.r );
-//		console.log( cell.size() );
-//		cell.attr("selected",true);
-	})
+	for(var i=0;i<SELECTED_CELLS.length;i++) {
+		var cell=SELECTED_CELLS[i];
+		changeSelectionState( cellAtCoords( cell.q, cell.r ), true );
+	}
 }

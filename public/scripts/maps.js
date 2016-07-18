@@ -1,33 +1,34 @@
 var SCALE = 1;
 var MAP_BORDER, HEX_SCALE, MAP_OFFSET, MAP_STAGGER;
+var SELECTED_CELLS = [];
 var MAP_META_DATA = {
 	'eriador.jpg': {
 		hex_scale: {'x':22.462, 'y':22.4},
 		map_border: {'x':151, y:134},
 		cell_offset: {'x':-0.7, 'y':0.3},
 		map_offset: {'q':0, 'r':0},
-		stagger: 2.0
+		stagger: {'parity':0, 'step':0}
 	},
 	'wilderland.jpg': {
 		hex_scale: {'x':22.462, 'y':22.4},
 		map_border: {'x':172, y:132},
-		cell_offset: {'x':-0.7, 'y':39.1},
+		cell_offset: {'x':-0.7, 'y':0.3},
 		map_offset: {'q':63, 'r':1},
-		stagger: -2.0
+		stagger: {'parity':1, 'step':1}
 	},
 	'rohan_and_gondor.jpg': {
 		hex_scale: {'x':22.462, 'y':22.4},
 		map_border: {'x':175, y:148},
 		cell_offset: {'x':-0.7, 'y':0.3},
 		map_offset: {'q':28, 'r':49},
-		stagger: 2.0
+		stagger: {'parity':0, 'step':0}
 	},
 	'mordor.jpg': {
 		hex_scale: {'x':22.462, 'y':22.4},
 		map_border: {'x':175, y:148},
 		cell_offset: {'x':-0.7, 'y':0.3},
 		map_offset: {'q':76, 'r':65},
-		stagger: 2.0
+		stagger: {'parity':0, 'step':0}
 	}
 }
 var MAP_ZOOM = 1;
@@ -71,7 +72,8 @@ function displayCurrentMap() {
 		metadata = MAP_META_DATA[CURRENT_MAP];
 		MAP_BORDER = metadata.map_border;
 		HEX_SCALE = metadata.hex_scale;
-		MAP_OFFSET = metadata.cell_offset;
+		MAP_OFFSET = metadata.map_offset;
+		CELL_OFFSET = metadata.cell_offset;
 		MAP_STAGGER = metadata.stagger;
 		
 		var map = $("#map")[0];

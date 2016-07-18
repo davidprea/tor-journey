@@ -39,8 +39,10 @@ function pointToVertices( point ) {
 */
 
 function gridLocToCenter( loc ) {
-	var xpos = HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + MAP_OFFSET.x;
-	var ypos = HEX_SCALE.y * Math.sqrt(3) * (loc.r + (loc.q % 2 / MAP_STAGGER)) + MAP_BORDER.y + MAP_OFFSET.y;
+	var xpos = HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x;
+	var stagger = (loc.q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step;
+//	console.log(stagger);
+	var ypos = HEX_SCALE.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + MAP_BORDER.y + CELL_OFFSET.y;
 	return {'x':xpos, 'y':ypos };
 }
 
