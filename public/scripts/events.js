@@ -61,10 +61,9 @@ function mouseOut( d, i ) {
 function mouseDown( d ) {
 	MOUSE_DOWN = true;
 	cell = d3.select(this);
-//	console.log(cell.attr("selected"));
-	DRAWING_MODE = !(cell.attr("selected") == "true");
+	DRAWING_MODE = !(cell.classed("selected"));
 	if( SHIFTED ) {
-		fillCells( d );
+		fillCells( cell, DRAWING_MODE );			
 	} else {
 		changeSelectionState( cell, DRAWING_MODE );
 	}
@@ -76,7 +75,7 @@ function mouseUp( d ) {
 
 function changeMap( radioButton ) {
 	selection = getSelectedCells();
-	console.log( SELECTED_CELLS );
+//	console.log( SELECTED_CELLS );
 	CURRENT_MAP = radioButton.getAttribute( "map_name") + ".jpg";
 	displayCurrentMap();
 	for(var i=0;i<SELECTED_CELLS.length;i++) {

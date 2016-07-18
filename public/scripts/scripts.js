@@ -35,3 +35,11 @@ var clearSel = function( stringName ) {
 	changeSelectionState( d3.selectAll("polygon"), false );
 }
 
+var selectionAsString = function() {
+	var result = "";
+	getSelectedCells().each( function(d) {
+		result += ";" + d.q + "," + d.r;
+	})
+	return result.substring(1,result.length);
+}
+

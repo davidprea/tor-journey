@@ -85,14 +85,14 @@ function drawHexes( data ) {
 		.data( data )
 		.enter().append("polygon")
 			.attr("points", function(d) {return gridLocToVertices(d);})
-			.attr("q", function(d) {return d.q + map_offset.q;})
-			.attr("r", function(d) {return d.r + map_offset.r;})
+			.attr("q", function(d) {return d.q + map_offset.q})
+			.attr("r", function(d) {return d.r + map_offset.r})
 	//		.attr("region_id", function(d) {return regionIdForCell(d);})
 			.attr("stroke", "transparent" )
 			.attr("stroke-width", 1 )
 			.attr("fill", "transparent" )
 			.attr("opacity", 0.5 )
-			.attr("selected", false )
+			.classed("selected", false )
 			.classed("hex_cell", "true" )
 			.on("mouseenter", mouseEnter )
 			.on("mouseout", mouseOut )
@@ -126,7 +126,7 @@ function revertCells( selection ) {
 function updateAppearance( selection ) {
 	selection
 		.each( function() {
-			var selected = d3.select(this).attr("selected") == "true";
+			var selected = d3.select(this).classed("selected");
 			d3.select(this)
 				.attr( "opacity", function() { return (selected ? 0.5 : 0.25 ); })
 				.attr( "fill", function() { return (selected ? "yellow" : "transparent"); })
@@ -151,20 +151,38 @@ function revertAllCells() {
 	revertCells( d3.selectAll(".hex_cell") );
 }
 
-function fillCells( selection ) {  // selection should be a single cell
-	r0 = selection.attr("r");
-	q0 = selection.attr("q");
-	for(var r = r0-1;r<r0+2;r++) {
-		for(var q = q0-1;q<q0+2;q++) {
-			if( r != r0 || q != q0 ) {
-				var neighbor = d3.select()
-				fillCells( {"q":q, "r":r } )
-			}
+function neighborsOf( cell ) { 
+	result = [];
+	var q = parseInt( cell.attr("q"));
+	var r = parseInt( cell.attr("r"));
+	var offset = ( q % 2 == 0 ? -1 : 0 );
+	var deltas = [[-1,offset],[-1,1 + offset],[0,-1],[0,1],[1, offset],[1,1 + offset]];
+	for(var i=0;i<deltas.length;i++) {
+		var newq = q + deltas[i][0];
+		var newr = r + deltas[i][1];
+		neighbor = cellAtCoords( newq, newr );
+		if( neighbor != null && neighbor.size() > 0) {
+			result.push( neighbor );
+		}	
+	}
+	return result;
+}
+
+function fillCells( cell, mode ) {  // selection should be a single cell
+	changeSelectionState( cell, mode );
+	var offset = ( cell.q % 2 == 0 ? -1 : 0 );
+	var neighbors = neighborsOf( cell );
+	for(var i=0;i<neighbors.length;i++) {
+		var neighbor = neighbors[i];
+		if( neighbor.classed("selected") != mode ) {
+			fillCells( neighbors[i], mode );			
 		}
 	}
 }
 
 function getSelectedCells() {
-	return d3.selectAll( ".hex_cell[selected='true'");
+	return d3.selectAll( ".hex_cell.selected");
 }
+
+
 
