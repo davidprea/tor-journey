@@ -13,9 +13,21 @@ end
 
 def getRegions
 	results = []
-	file = File.open("public/all_regions.json","r")
+	file = File.open("regions.tsv","r")
+	headings = file.readline().strip().split("\t")
+	index = 0
 	file.each_line do | line |
-		results.push JSON.parse( line )
+		entry = {"id":index}
+		index += 1
+		values = line.strip().split("\t")
+		if( true )
+			values.each_with_index do | val, i |
+				entry[headings[i]] = val
+			end
+			entry["cells"] = entry["cells"].split(';')
+			entry["cells"] = entry["cells"].collect{|x| {"q"=>x.split(",")[0].to_i, "r"=>x.split(",")[1].to_i}}
+			results.push entry
+		end
 	end
 	file.close
 	return results

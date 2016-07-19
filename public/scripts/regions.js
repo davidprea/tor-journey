@@ -1,8 +1,24 @@
 var REGIONS = null;
+var CELLS = [];
 
 function loadRegions() {
 	$.get( '/regions.json', function( json ) {
 		REGIONS = JSON.parse(json);
+
+		for(var i=0;i<REGIONS.length;i++) {
+			var region = REGIONS[i];
+			for(var j=0;j<region.cells.length;j++){
+				var cell = region.cells[j];
+				if (CELLS[cell.q] == undefined) {
+					CELLS[cell.q] = [];
+				}
+				
+				if (CELLS[cell.q][cell.r] == undefined ) {
+					CELLS[cell.q][cell.r] = [];
+				}
+				CELLS[cell.q][cell.r].push( region );
+			}
+		}
 
 //		me_regions = data.regions;
 //		me_region_table = data.cells;
@@ -26,8 +42,8 @@ function loadRegions() {
 	})
 }
 
-function regionsForCell( location ) {
-	result = [];
+function regionsForCell( q, r ) {
+	/*result = [];
 	for(var i=0;i<REGIONS.length;i++) {
 		region = REGIONS[i];
 		for(var j=0;j<region.cells.length;j++) {
@@ -37,7 +53,13 @@ function regionsForCell( location ) {
 			}
 		}
 	}
-	return result;
+	return result;*/
+	if( CELLS[q] == undefined || 
+		CELLS[q][r] == undefined ) {
+		return undefined;
+	} else {
+		return CELLS[q][r];
+	}
 }
 
 function findRegionByName( stringName ) {
@@ -50,11 +72,22 @@ function findRegionByName( stringName ) {
 	return null;
 }
 
+function findRegionByID( id ) {
+		for(var i=0;i<REGIONS.length;i++) {
+		region = REGIONS[i];
+		if( region.id == id) {
+			return region;
+		}
+	}
+	return null;
+}
+
+
 
 function highlightRegion( region ) {
 	revertAllCells(); // need to write this
 	for(var i=0;i<region.cells.length;i++) {
 		cell = region.cells[i];
-		selectCells( selectionForCoords( cell.q, cell.r ) );
+		changeSelectionState( cellAtCoords( cell.q, cell.r), true );
 	}
 }

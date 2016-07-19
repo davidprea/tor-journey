@@ -38,11 +38,17 @@ function pointToVertices( point ) {
 }
 */
 
+function cellLocToCenter( cell ) {
+	var loc = {"q": cell.q - MAP_OFFSET.q, "r": cell.r - MAP_OFFSET.r};
+	var point = gridLocToCenter( cell );
+	return point;
+}
+
 function gridLocToCenter( loc ) {
-	var xpos = HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x;
+	var xpos = Math.floor( HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x );
 	var stagger = (loc.q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step;
 //	console.log(stagger);
-	var ypos = HEX_SCALE.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + MAP_BORDER.y + CELL_OFFSET.y;
+	var ypos = Math.floor( HEX_SCALE.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + MAP_BORDER.y + CELL_OFFSET.y );
 	return {'x':xpos, 'y':ypos };
 }
 
@@ -68,9 +74,24 @@ function gridLocToVertices( location ) {
 }
 
 function pointToGrid( point ) {
-	var adjx = point.x - (MAP_BORDER.x + MAP_OFFSET.x);
-	var adjy = point.y - (MAP_BORDER.y + MAP_OFFSET.y);
-	return { 'q': Math.round((2.0 * adjx / 3) / HEX_SCALE.x), 'r': Math.round((1.0/3 * Math.sqrt(3) * adjy - 1.0 / 3 * adjx) / HEX_SCALE.y )}
+	var adjx = point.x - (MAP_BORDER.x + CELL_OFFSET.x);
+	var adjy = point.y - (MAP_BORDER.y + CELL_OFFSET.y);
+	var q = Math.round((2.0 * adjx / 3) / HEX_SCALE.x);
+	var stagger = (q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step
+//	var r = (1.0/3 * Math.sqrt(3) * adjy - 1.0 / 3 * adjx) / HEX_SCALE.y;
+	var r = (adjy / (HEX_SCALE.y * Math.sqrt(3))) - (q%2/2.0) - stagger;
+	var grid = { 'q': q, 'r': Math.round(r)};
+//	console.log(grid);
+	return grid;
+}
+
+function pointToCoords( point ) {
+	var grid = pointToGrid( {"x":point[0], "y":point[1]} );
+	var q = grid.q + MAP_OFFSET.q;
+	var r = grid.r + MAP_OFFSET.r;
+	result = {"q":q, "r":r};
+//	console.log(result);
+	return result;
 }
 
 function fillColor( cell ) {
@@ -78,15 +99,13 @@ function fillColor( cell ) {
 }
 
 function drawHexes( data ) {	
-	var map_offset = MAP_META_DATA[CURRENT_MAP].map_offset;
-
 	d3.select( "#overlay" )
 		.selectAll( "polygon" )
 		.data( data )
 		.enter().append("polygon")
 			.attr("points", function(d) {return gridLocToVertices(d);})
-			.attr("q", function(d) {return d.q + map_offset.q})
-			.attr("r", function(d) {return d.r + map_offset.r})
+			.attr("q", function(d) {return d.q + MAP_OFFSET.q})
+			.attr("r", function(d) {return d.r + MAP_OFFSET.r})
 	//		.attr("region_id", function(d) {return regionIdForCell(d);})
 			.attr("stroke", "transparent" )
 			.attr("stroke-width", 1 )
@@ -143,12 +162,18 @@ function cellAtCoords( q, r ) {
 	return d3.select( selectorForCoords( q, r ));
 }
 
-function revertCellByCoords( q, r ) {
-	revertCells( d3.select(selectorForCoords(q,r)));
+function cellAtPoint( point ) {
+	var coords = pointToCoords( point );
+	return cellAtCoords( coords.q, coords.r );
 }
 
+
+/*function revertCellByCoords( q, r ) {
+	revertCells( d3.select(selectorForCoords(q,r)));
+}*/
+
 function revertAllCells() {
-	revertCells( d3.selectAll(".hex_cell") );
+	changeSelectionState( d3.selectAll(".hex_cell"), false );
 }
 
 function neighborsOf( cell ) { 
@@ -183,6 +208,74 @@ function fillCells( cell, mode ) {  // selection should be a single cell
 function getSelectedCells() {
 	return d3.selectAll( ".hex_cell.selected");
 }
+
+function dateStringFromDate( date ) {
+	var monthNames = [ "January", "February", "March", "April", "May", "June",
+	    "July", "August", "September", "October", "November", "December" ];
+	var month = monthNames[ date.getMonth() ].substring(0,3)
+	return month + " " + date.getDate();
+}
+
+function displayDates( data ) {
+	
+	var cells = sortedCells();
+
+	d3.select( "#overlay" )
+		.selectAll("text")
+		.remove();
+	
+	var s = d3.select( "#overlay" )
+		.selectAll( "text" )
+		.data(data);
+				
+	s.enter().append("text")
+		.classed( "cell_date", "true" )
+		.attr("x", function(d) {return cellLocToCenter(d).x; })
+		.attr("y", function(d) {return cellLocToCenter(d).y + 3; })
+		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
+		.text( function(d) {return dateStringFromDate(d.date);})
+		.on("mouseenter", mouseEnter )
+		.on("mouseout", mouseOut )
+		.on("mousedown", mouseDown )
+		.on("mouseup", mouseUp )
+		.attr("text-anchor","middle");
+//		.attr("stroke", "saddlebrown" )
+//		.attr("font-size", 10);
+		
+	s.exit().remove();
+}
+
+/* TESTING FUNCTION */
+function numberCells() {
+	
+	var cells = sortedCells();
+
+	d3.select( "#overlay" )
+		.selectAll("text")
+		.remove();
+	
+	var s = d3.select( "#overlay" )
+		.selectAll( "text" )
+		.data(cells);
+				
+	s.enter().append("text")
+		.classed( "cell_date", "true" )
+		.attr("x", function(d) {return cellLocToCenter(d).x; })
+		.attr("y", function(d) {return cellLocToCenter(d).y + 3; })
+		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
+		.text( function(d,i) {return i;})
+		.on("mouseenter", mouseEnter )
+		.on("mouseout", mouseOut )
+		.on("mousedown", mouseDown )
+		.on("mouseup", mouseUp )
+		.attr("text-anchor","middle");
+//		.attr("stroke", "saddlebrown" )
+//		.attr("font-size", 10);
+		
+	s.exit().remove();
+}
+
+
 
 
 

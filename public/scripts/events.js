@@ -1,14 +1,11 @@
 var DRAWING_MODE = true;
 var MOUSE_DOWN = false;
 
-function mouseEnter( d ) {
-//	document.getElementById( "coordinates").innerHTML = "("+d.q+","+d.r+")"
-	/*if( mouse_down ) {
-		selectCell( d, i, d3.select(this) );
-	}*/
+function mouseEnter() {
+	point = d3.mouse(this);
+	cell = cellAtPoint(point);
 
-	cell = d3.select(this);
-	displayCellLocation( cell );
+	displayCellInfo( cell );
 //	console.log( `${d.r}, ${d.q}`)
 
 	if( MOUSE_DOWN ) {
@@ -44,8 +41,11 @@ function mouseEnter( d ) {
 }
 
 
-function mouseOut( d, i ) {
-	var cell = d3.select(this);
+function mouseOut() {
+	point = d3.mouse(this);
+	cell = cellAtPoint(point);
+
+//	cell = cellForEvent(cell);
 //	var checkbox = document.getElementById( "toggle_grid" );
 /*
 	var cell = d3.select(this)
@@ -58,9 +58,13 @@ function mouseOut( d, i ) {
 */
 }
 
-function mouseDown( d ) {
+
+function mouseDown() {
 	MOUSE_DOWN = true;
-	cell = d3.select(this);
+	point = d3.mouse(this);
+	cell = cellAtPoint(point);
+	if( cell.size() == 0 ) { return }
+
 	DRAWING_MODE = !(cell.classed("selected"));
 	if( SHIFTED ) {
 		fillCells( cell, DRAWING_MODE );			
@@ -71,6 +75,8 @@ function mouseDown( d ) {
 
 function mouseUp( d ) {
 	MOUSE_DOWN = false;
+	//numberCells();
+	computeJourney();
 }
 
 function changeMap( radioButton ) {
