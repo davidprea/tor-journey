@@ -6,6 +6,7 @@ $(document).ready( function() {
 
 	loadMaps();
 	loadRegions();
+	loadLocations();
 //	drawGrid();
 
 	$( "#control_panel" ).mouseenter( function() {
@@ -16,6 +17,8 @@ $(document).ready( function() {
 	});
 
 	console.log("fading?");
+
+//	setUpBlurFilter();
 })
 
 $(document).on('keyup keydown', function(e){SHIFTED = e.shiftKey} );
@@ -26,17 +29,23 @@ function displayCellInfo( cell ) {
 	$("#cell_location").html( `${q}, ${r}` );
 	region = regionsForCell( q, r );// CELLS[q][r];
 	if( region != undefined ) {
+		$("#region_count").html( region.length );
+
 		region = region[0];
-		$("#region_id").html( region["id"] );
-		$("#region_name").html( region["name"] );
-		$("#region_type").html( region["type"] );
-		$("#region_terrain").html( region["terrain"] );
+		$("#region_id").html( region.id );
+		$("#region_name").html( region.name );
+		$("#region_type").html( region.type );
+		$("#region_terrain").html( region.terrain );
 	} else {
 		$("#region_id").html( "" );
 		$("#region_name").html( "" );
 		$("#region_type").html( "" );
 		$("#region_terrain").html( "" );		
 	}		
+}
+
+function fillModeOn() {
+	return $("#tagging_mode").prop('checked')
 }
 
 /* CONSOLE COMMANDS */
@@ -51,8 +60,8 @@ var highlightRegionID = function( id ) {
 	highlightRegion( region );
 }
 
-var clearSel = function( stringName ) {
-	changeSelectionState( d3.selectAll("polygon"), false );
+var clearSel = function() {
+	changeSelectionState( d3.selectAll("polygon.hex_cell"), false );
 }
 
 var selectionAsString = function() {

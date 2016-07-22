@@ -1,10 +1,16 @@
 %fieldset
+	%button{ :onclick => "clearSel()" }
+		Clear Selection
+%fieldset
 	%legend
 		Location
 	%label#cell_location
 %fieldset
 	%legend
 		Region
+	Count:
+	%label#region_count
+	%br
 	ID:
 	%label#region_id
 	%br
@@ -17,3 +23,8 @@
 	Terrain:
 	%label#region_terrain
 	%br
+%fieldset
+	%legend
+		Tagging Mode
+	%input{ :type => 'checkbox', :checked => false, :onchange => '', :id => "tagging_mode" }
+		Enable

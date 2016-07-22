@@ -284,9 +284,10 @@ text {
 }
 
 .cell_date {
-	stroke:saddlebrown;
+	stroke:black;
 	cursor:pointer;
 }
+
 
 .fileload {
 	width: auto;

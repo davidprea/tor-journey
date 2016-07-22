@@ -20,14 +20,28 @@ def getRegions
 		entry = {"id":index}
 		index += 1
 		values = line.strip().split("\t")
-		if( true )
-			values.each_with_index do | val, i |
-				entry[headings[i]] = val
-			end
-			entry["cells"] = entry["cells"].split(';')
-			entry["cells"] = entry["cells"].collect{|x| {"q"=>x.split(",")[0].to_i, "r"=>x.split(",")[1].to_i}}
-			results.push entry
+		values.each_with_index do | val, i |
+			entry[headings[i]] = val
 		end
+		entry["cells"] = entry["cells"].split(';')
+		entry["cells"] = entry["cells"].collect{|x| {"q"=>x.split(",")[0].to_i, "r"=>x.split(",")[1].to_i}}
+		results.push entry
+	end
+	file.close
+	return results
+end
+
+def getLocations
+	results = []
+	file = File.open("locations.csv","r")
+	headings = file.readline().strip().split(",")
+	file.each_line do | line |
+		entry = {};
+		values = line.strip().split(",")
+		values.each_with_index do | val, i |
+			entry[headings[i]] = ( /\A\d+\z/.match(val) ? val.to_i : val )
+		end
+		results.push entry
 	end
 	file.close
 	return results
@@ -36,6 +50,10 @@ end
 get '/regions.json' do
 	#getRegions.to_json
 	getRegions.to_json
+end
+
+get '/locations.json' do
+	getLocations.to_json
 end
 
 get '/mapnames' do

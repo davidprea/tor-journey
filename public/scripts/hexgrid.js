@@ -12,7 +12,6 @@ function drawGrid() {
 	var columns = ($("#map").width() - (2 * MAP_BORDER.x)) / HEX_SCALE.x * 0.66;
 	var rows = ($("#map").height() - (2 * MAP_BORDER.y)) / HEX_SCALE.y * 0.555 + 1;
 	
-//	console.log( "columns: " + columns + " rows: " + rows );
 
 	for(var q=1;q<columns;q++) {
 		for( var r=1;r<rows;r++) {
@@ -33,21 +32,19 @@ function pointToVertices( point ) {
 		var y = point.y + HEX_SCALE * Math.sin(angle);
 		string += x + "," + y + " ";
 	}
-	console.log( string );
 	return string;
 }
 */
 
 function cellLocToCenter( cell ) {
 	var loc = {"q": cell.q - MAP_OFFSET.q, "r": cell.r - MAP_OFFSET.r};
-	var point = gridLocToCenter( cell );
+	var point = gridLocToCenter( loc );
 	return point;
 }
 
 function gridLocToCenter( loc ) {
 	var xpos = Math.floor( HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x );
 	var stagger = (loc.q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step;
-//	console.log(stagger);
 	var ypos = Math.floor( HEX_SCALE.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + MAP_BORDER.y + CELL_OFFSET.y );
 	return {'x':xpos, 'y':ypos };
 }
@@ -81,7 +78,6 @@ function pointToGrid( point ) {
 //	var r = (1.0/3 * Math.sqrt(3) * adjy - 1.0 / 3 * adjx) / HEX_SCALE.y;
 	var r = (adjy / (HEX_SCALE.y * Math.sqrt(3))) - (q%2/2.0) - stagger;
 	var grid = { 'q': q, 'r': Math.round(r)};
-//	console.log(grid);
 	return grid;
 }
 
@@ -90,7 +86,6 @@ function pointToCoords( point ) {
 	var q = grid.q + MAP_OFFSET.q;
 	var r = grid.r + MAP_OFFSET.r;
 	result = {"q":q, "r":r};
-//	console.log(result);
 	return result;
 }
 
@@ -116,7 +111,8 @@ function drawHexes( data ) {
 			.on("mouseenter", mouseEnter )
 			.on("mouseout", mouseOut )
 			.on("mousedown", mouseDown )
-			.on("mouseup", mouseUp );
+			.on("mouseup", mouseUp )
+			.style("cursor","pointer");
 }
 
 var selectTest = function(arg) {
@@ -147,11 +143,12 @@ function updateAppearance( selection ) {
 		.each( function() {
 			var selected = d3.select(this).classed("selected");
 			d3.select(this)
-				.attr( "opacity", function() { return (selected ? 0.5 : 0.25 ); })
-				.attr( "fill", function() { return (selected ? "yellow" : "transparent"); })
-				.attr( "stroke", function() { return (selected ? "yellow" : "transparent"); })  // function() { return (checkbox.checked ? "red" : "transparent" );}) 
+				.attr( "opacity", function() { return (selected ? 0.25 : 0 ); })
+				.attr( "fill", function() { return (selected ? "white" : "transparent"); })
+				.attr( "stroke", function() { return (selected ? "grey" : "transparent"); })  // function() { return (checkbox.checked ? "red" : "transparent" );}) 
 				.attr( "stroke-width", function() { return (selected ? 2 : 1); })
 		})
+	
 }
 
 function selectorForCoords( q, r ) {
@@ -165,6 +162,42 @@ function cellAtCoords( q, r ) {
 function cellAtPoint( point ) {
 	var coords = pointToCoords( point );
 	return cellAtCoords( coords.q, coords.r );
+}
+
+function setUpBlurFilter() {
+	// filters go in defs element
+	var defs = d3.select("svg").append("defs");
+
+	// create filter with id #drop-shadow
+	// height=130% so that the shadow is not clipped
+	var filter = defs.append("filter")
+	    .attr("id", "drop-shadow")
+	    .attr("height", "130%");
+
+	// SourceAlpha refers to opacity of graphic that this filter will be applied to
+	// convolve that with a Gaussian with standard deviation 3 and store result
+	// in blur
+	filter.append("feGaussianBlur")
+	    .attr("in", "SourceAlpha")
+	    .attr("stdDeviation", 3)
+	    .attr("result", "blur");
+
+	// translate output of Gaussian blur to the right and downwards with 2px
+	// store result in offsetBlur
+	filter.append("feOffset")
+	    .attr("in", "blur")
+	    .attr("dx", 2)
+	    .attr("dy", 2)
+	    .attr("result", "offsetBlur");
+
+	// overlay original SourceGraphic over translated blurred opacity by using
+	// feMerge filter. Order of specifying inputs is important!
+	var feMerge = filter.append("feMerge");
+
+	feMerge.append("feMergeNode")
+	    .attr("in", "offsetBlur")
+	feMerge.append("feMergeNode")
+	    .attr("in", "SourceGraphic");
 }
 
 
@@ -217,12 +250,12 @@ function dateStringFromDate( date ) {
 }
 
 function displayDates( data ) {
-	
-	var cells = sortedCells();
 
 	d3.select( "#overlay" )
 		.selectAll("text")
 		.remove();
+
+	
 	
 	var s = d3.select( "#overlay" )
 		.selectAll( "text" )
@@ -238,8 +271,8 @@ function displayDates( data ) {
 		.on("mouseout", mouseOut )
 		.on("mousedown", mouseDown )
 		.on("mouseup", mouseUp )
-		.attr("text-anchor","middle");
-//		.attr("stroke", "saddlebrown" )
+		.attr("text-anchor","middle")
+		.style("filter", "url(#drop-shadow)")
 //		.attr("font-size", 10);
 		
 	s.exit().remove();
@@ -273,6 +306,35 @@ function numberCells() {
 //		.attr("font-size", 10);
 		
 	s.exit().remove();
+}
+
+function drawJourney( sortedCells ) {
+	// filters go in defs element
+
+	var data = [];
+	for(var i=0;i<sortedCells.length;i++) {
+		data.push( cellLocToCenter( sortedCells[i] ) );
+	}
+
+	var lineFunction = d3.svg.line()
+		.x(function(d) { return d.x; })
+		.y(function(d) { return d.y; })
+		.interpolate("linear");
+
+
+
+	var journey = d3.select("svg").append("path")
+		.attr("d", lineFunction(data))
+		.attr("stroke","darkred")
+		.attr("stroke-width",8)
+		.attr("fill","none")
+		.on("mouseenter", mouseEnter )
+		.on("mouseout", mouseOut )
+		.on("mousedown", mouseDown )
+		.on("mouseup", mouseUp )
+		.attr("stroke-linecap","round")
+		.attr("stroke-dasharray","12,12")
+		.attr("stroke-linejoin","round")
 }
 
 

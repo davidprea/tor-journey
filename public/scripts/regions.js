@@ -17,8 +17,15 @@ function loadRegions() {
 					CELLS[cell.q][cell.r] = [];
 				}
 				CELLS[cell.q][cell.r].push( region );
+//				cellAtCoords(cell.q,cell.r).classed("valid",true);
 			}
 		}
+
+//		d3.selectAll("circle.valid")
+//			.style("cursor","pointer");
+
+		// now assign ghostbusters cursor to untagged cells
+
 
 //		me_regions = data.regions;
 //		me_region_table = data.cells;

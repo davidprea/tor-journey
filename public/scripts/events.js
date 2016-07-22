@@ -6,7 +6,6 @@ function mouseEnter() {
 	cell = cellAtPoint(point);
 
 	displayCellInfo( cell );
-//	console.log( `${d.r}, ${d.q}`)
 
 	if( MOUSE_DOWN ) {
 		changeSelectionState( cell, DRAWING_MODE );
@@ -66,7 +65,7 @@ function mouseDown() {
 	if( cell.size() == 0 ) { return }
 
 	DRAWING_MODE = !(cell.classed("selected"));
-	if( SHIFTED ) {
+	if( fillModeOn() && SHIFTED ) {
 		fillCells( cell, DRAWING_MODE );			
 	} else {
 		changeSelectionState( cell, DRAWING_MODE );
@@ -76,12 +75,12 @@ function mouseDown() {
 function mouseUp( d ) {
 	MOUSE_DOWN = false;
 	//numberCells();
-	computeJourney();
+	
+//	computeJourney();
 }
 
 function changeMap( radioButton ) {
 	selection = getSelectedCells();
-//	console.log( SELECTED_CELLS );
 	CURRENT_MAP = radioButton.getAttribute( "map_name") + ".jpg";
 	displayCurrentMap();
 	for(var i=0;i<SELECTED_CELLS.length;i++) {
