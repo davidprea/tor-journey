@@ -42,6 +42,11 @@ function cellLocToCenter( cell ) {
 	return point;
 }
 
+function translateStringForCell( cell ) {
+	var point = cellLocToCenter( cell );
+	return "translate(" + point.x + ", " + point.y + ")";
+}
+
 function gridLocToCenter( loc ) {
 	var xpos = Math.floor( HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x );
 	var stagger = (loc.q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step;
@@ -49,22 +54,23 @@ function gridLocToCenter( loc ) {
 	return {'x':xpos, 'y':ypos };
 }
 
-function gridLocToVertices( location ) {
+function gridLocToVertices( location, scale ) {
 	var center = gridLocToCenter( location );
-	
+	var radius = scale * HEX_SCALE.x; // this still gets multiplied for every cell
+
 	if( hex_offsets.length == 0 ) {
 		for(var v=0;v<6;v++) {
 			var angle = 2 * Math.PI / 6 * v;
-			var dx = HEX_SCALE.x * Math.cos(angle) * 0.9;
-			var dy = HEX_SCALE.y * Math.sin(angle) * 0.9;
+			var dx = Math.cos(angle);
+			var dy = Math.sin(angle);
 			hex_offsets[v] = {"dx":dx, "dy":dy}
 		}		
 	}
 	
 	var string = "";
 	for(var v=0;v<6;v++) {
-		var x1 = center.x + hex_offsets[v].dx;
-		var y1 = center.y + hex_offsets[v].dy;
+		var x1 = center.x + (hex_offsets[v].dx * radius);
+		var y1 = center.y + (hex_offsets[v].dy * radius);
 		string += x1.toFixed(1) + "," + y1.toFixed(1) + " ";
 	}
 	return string;
@@ -95,10 +101,10 @@ function fillColor( cell ) {
 
 function drawHexes( data ) {	
 	d3.select( "#overlay" )
-		.selectAll( "polygon" )
+		.selectAll( "polygon.hex_cell" )
 		.data( data )
 		.enter().append("polygon")
-			.attr("points", function(d) {return gridLocToVertices(d);})
+			.attr("points", function(d) {return gridLocToVertices(d,0.9);})
 			.attr("q", function(d) {return d.q + MAP_OFFSET.q})
 			.attr("r", function(d) {return d.r + MAP_OFFSET.r})
 	//		.attr("region_id", function(d) {return regionIdForCell(d);})
@@ -242,46 +248,125 @@ function getSelectedCells() {
 	return d3.selectAll( ".hex_cell.selected");
 }
 
-function dateStringFromDate( date ) {
+function dateStringsFromCell( cell ) {
 	var monthNames = [ "January", "February", "March", "April", "May", "June",
 	    "July", "August", "September", "October", "November", "December" ];
-	var month = monthNames[ date.getMonth() ].substring(0,3)
-	return month + " " + date.getDate();
+	var start_month = monthNames[ cell.begin_date.getMonth() ].substring(0,3)
+	var start_day = cell.begin_date.getDate();
+	var end_month = monthNames[ cell.end_date.getMonth() ].substring(0,3)
+	var end_day = cell.end_date.getDate();
+
+	results = [];
+
+	if( start_month != end_month ) {
+		result[0] = start_month + " " + start_day;
+		result[1] = end_month + " " + end_day;
+	} else {
+		if( start_day != end_day ) {
+			result[0] = start_month;
+			result[1] = start_day + " - " + end_day;
+		} else {
+			result[0] = start_month;
+			result[1] = start_day;
+		}
+	}
+	return result;
 }
 
 function displayDates( data ) {
 
-	d3.select( "#overlay" )
-		.selectAll("text")
+	// var first_and_last = [ data[0], data[data.length-1] ];
+
+	d3.select( "#overlay")
+		.selectAll( "g.date" )
 		.remove();
 
-	
-	
-	var s = d3.select( "#overlay" )
-		.selectAll( "text" )
-		.data(data);
+	var p = d3.select("#overlay")
+		.selectAll("g.date")
+		.data(data)
+		.enter().append("g")
+			.classed("date",true)
+			.classed("inner_date", function(d,i) { return i > 0 && i < data.length - 1})
+			.attr("q", function(d) { return d.q } )
+			.attr("r", function(d) { return d.r } )
+			.attr("opacity", function(d,i) {return (i == 0 || i == data.length - 1 ? 0.7 : 0.0 )})
+			.attr( "transform", function(d) { return translateStringForCell(d) } )
+//			.on("mouseenter", mouseEnter )
+//			.on("mouseout", mouseOut )
+//			.on("mousedown", mouseDown )
+//			.on("mouseup", mouseUp )
+
+	// build points string
+	var center = { "x": 0, "y": 0 };
+	var radius = HEX_SCALE.y * 0.9	
+	var points = "";
+	for(var v=0;v<6;v++) {
+		var x1 = center.x + (hex_offsets[v].dx * radius);
+		var y1 = center.y + (hex_offsets[v].dy * radius);
+		points += x1.toFixed(1) + "," + y1.toFixed(1) + " ";
+	}
+
+	p.append("polygon")
+			.attr("points", points )
+			.attr("fill","yellow")//function(d,i) { return ( i == 0 ? "red" : "green" )})
+			.attr("stroke","none")
+			.attr("stroke-width",0)
+
+
+			.append( "text" )
+				.text(function(d,i) {return "hello"})
+				.attr("x", 15 )
+				.attr("y", 15 );
+
 				
-	s.enter().append("text")
+	p.append("text")
 		.classed( "cell_date", "true" )
-		.attr("x", function(d) {return cellLocToCenter(d).x; })
-		.attr("y", function(d) {return cellLocToCenter(d).y + 3; })
+		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
+		.attr("y", -2 ) // function(d) {return cellLocToCenter(d).y + 3; })
 		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
-		.text( function(d) {return dateStringFromDate(d.date);})
-		.on("mouseenter", mouseEnter )
-		.on("mouseout", mouseOut )
-		.on("mousedown", mouseDown )
-		.on("mouseup", mouseUp )
+		.html( function(d) {return dateStringsFromCell(d)[0];})
 		.attr("text-anchor","middle")
-		.style("filter", "url(#drop-shadow)")
+
+	p.append("text")
+		.classed( "cell_date", "true" )
+		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
+		.attr("y", 10 ) // function(d) {return cellLocToCenter(d).y + 3; })
+		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
+		.html( function(d) {return dateStringsFromCell(d)[1];})
+		.attr("text-anchor","middle")
+
+//		.style("filter", "url(#drop-shadow)")
 //		.attr("font-size", 10);
 		
-	s.exit().remove();
+//	s.exit().remove(); 
 }
 
 /* TESTING FUNCTION */
-function numberCells() {
+function numberCells(cells) {
 	
-	var cells = sortedCells();
+	d3.select( "#overlay")
+		.selectAll( "polygon.number" )
+		.remove();
+
+	var p = d3.select("#overlay")
+		.selectAll("polygon.number")
+		.data(cells)
+		.enter().append("polygon")
+			.classed("number","true")
+//			.attr("x", function(d) {return cellLocToCenter(d).x + 10; })
+//			.attr("y", function(d) {return cellLocToCenter(d).y + 10; })
+			.attr("points", function(d) {return gridLocToVertices(d, 0.5);})
+			.attr("fill","white")
+			.attr("stroke","black")
+			.attr("stroke-width",4)
+			.attr("opacity",0.5)
+			.on("mouseenter", mouseEnter )
+			.on("mouseout", mouseOut )
+			.on("mousedown", mouseDown )
+			.on("mouseup", mouseUp );
+
+
+/*
 
 	d3.select( "#overlay" )
 		.selectAll("text")
@@ -306,6 +391,7 @@ function numberCells() {
 //		.attr("font-size", 10);
 		
 	s.exit().remove();
+*/
 }
 
 function drawJourney( sortedCells ) {
@@ -319,7 +405,7 @@ function drawJourney( sortedCells ) {
 	var lineFunction = d3.svg.line()
 		.x(function(d) { return d.x; })
 		.y(function(d) { return d.y; })
-		.interpolate("linear");
+		.interpolate("basis"); 
 
 
 
@@ -335,6 +421,7 @@ function drawJourney( sortedCells ) {
 		.attr("stroke-linecap","round")
 		.attr("stroke-dasharray","12,12")
 		.attr("stroke-linejoin","round")
+		.style("cursor","pointer")
 }
 
 

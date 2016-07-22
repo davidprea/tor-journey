@@ -1,15 +1,29 @@
 var DRAWING_MODE = true;
 var MOUSE_DOWN = false;
 
+function mouseEnterDate() {
+//	d3.select(this).attr("opacity",1.0);
+	d3.select(this).attr("opacity",0.95);
+//this.setAttribute( "style.opacity","1.0");
+//	mouseEnter();
+}
+
 function mouseEnter() {
+/*	var target = d3.select(this);
+	if( target.classed("date") ) {
+		target.attr("opacity",0.95);
+	}
+*/
 	point = d3.mouse(this);
 	cell = cellAtPoint(point);
-
 	displayCellInfo( cell );
 
-	if( MOUSE_DOWN ) {
+/*	if( MOUSE_DOWN ) {
 		changeSelectionState( cell, DRAWING_MODE );
 	}
+*/
+
+
 /*	cell
 		.attr( "stroke", "yellow" )
 		.attr( "stroke-width", 2 )
@@ -39,10 +53,22 @@ function mouseEnter() {
 	*/
 }
 
+function mouseOutDate() {
+//	console.log(this);
+//	d3.select(this).attr("opacity",0);
+//	mouseOut();
+}
 
 function mouseOut() {
-	point = d3.mouse(this);
-	cell = cellAtPoint(point);
+	d3.selectAll("g.inner_date").attr("opacity",0.0);
+
+/*	var target = d3.select(this);
+	if( target.classed("date") ) {
+		target.attr("opacity",0.0);
+	}
+*/
+//	point = d3.mouse(this);
+//	cell = cellAtPoint(point);
 
 //	cell = cellForEvent(cell);
 //	var checkbox = document.getElementById( "toggle_grid" );
@@ -59,7 +85,7 @@ function mouseOut() {
 
 
 function mouseDown() {
-	MOUSE_DOWN = true;
+//	MOUSE_DOWN = true;
 	point = d3.mouse(this);
 	cell = cellAtPoint(point);
 	if( cell.size() == 0 ) { return }
@@ -73,7 +99,7 @@ function mouseDown() {
 }
 
 function mouseUp( d ) {
-	MOUSE_DOWN = false;
+//	MOUSE_DOWN = false;
 	//numberCells();
 	
 //	computeJourney();

@@ -21,20 +21,21 @@ function changeSelectionState( selection, selected ) {
 				}					
 			}
 		
-		} else { console.log( "invalid: " + d.q + ", " + d.r )}
+		} 
 	})
 
 	if( changed == true ) {
 		d3.select("svg").selectAll("text").remove();
 		d3.select("svg").selectAll("path").remove();
 
+		updateAppearance(selection);		
+
 		if( !($("#tagging_mode").prop('checked'))) {
 			computeJourney();
+
 		}
 
-		updateAppearance(selection);		
 	}
-//	numberCells();
 }
 
 function isValidCell( cell ) {
@@ -144,6 +145,8 @@ function computeJourney() {
 
 	// draw the journey path
 	drawJourney( sorted_cells );
+	//numberCells( sorted_cells );		
+
 
 	/* RESOLVE REGIONS */
 	resolveRegionsFor( sorted_cells );
@@ -236,12 +239,13 @@ function computeJourney() {
 	journey["total_days"] = 0;
 	
 	/* DATES */
-	var month = document.getElementById( "startmonth" ).value;
-	var day = document.getElementById( "startday" ).value;
-	var start_date = new Date( 0, month, day );
+	var start_month = parseInt( document.getElementById( "startmonth" ).value );
+	var start_day = parseInt( document.getElementById( "startday" ).value );
+	var start_date = new Date( 0, start_month, start_day );
 //	date.setDate( date.getDate() - 1 ); // does this work?
 //	var end_date = new Date(0, month, day );
 	var date_cells = [];
+	var currentDate = new Date( start_date );
 
 	var speed = ( document.getElementById("riding").checked ? 40 : 20 );
 	
@@ -249,7 +253,7 @@ function computeJourney() {
 	/* SET LEG ATTRIBUTES */
 	/* First time through just set values */
 	
-	var last_day_stamped = -1
+	var last_day_stamped = -1;
 	for(var i=0;i<journey.length;i++) {
 		var leg = journey[i];
 		leg["days"] = 0;
@@ -280,14 +284,15 @@ function computeJourney() {
 		leg["miles"] = 0;
 		
 		for(var c=0;c<leg.cells.length;c++) {
+			var begin_date = new Date( currentDate );
+//			date.setDate( )
 			var cell=leg.cells[c];
-
 			var rdp = Math.floor( journey.total_days );
 			if( rdp > last_day_stamped ) {
 				var date = new Date( start_date );
 				date.setDate( date.getDate() + rdp );
 				cell["date"] = date;
-				date_cells.push( cell );
+//				date_cells.push( cell );
 				last_day_stamped = rdp;
 			}
 			
@@ -295,11 +300,16 @@ function computeJourney() {
 			// time to cross
 			var apparent_distance = cell.distance * terrains[leg.region.terrain].multiplier;
 			var days_to_cross = apparent_distance / speed;
-			journey.total_days += days_to_cross
+			console.log( days_to_cross );
+			journey.total_days += days_to_cross;
 			leg.days += days_to_cross;
 			var days_per_roll = daysPerRoll( date.getMonth());
 			journey.total_rolls += days_to_cross / days_per_roll;
-						
+			var currentDay = start_day + ( Math.floor(journey.total_days) == journey.total_days ? journey.total_days : Math.ceil(journey.total_days) - 1 );
+			currentDate = new Date( 0, start_month, currentDay );
+			cell[ "begin_date" ] = begin_date;
+			cell[ "end_date" ] = currentDate;
+			date_cells.push( cell );
 		}
 		
 		journey.total_miles += leg.miles;

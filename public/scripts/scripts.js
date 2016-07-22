@@ -26,6 +26,8 @@ $(document).on('keyup keydown', function(e){SHIFTED = e.shiftKey} );
 function displayCellInfo( cell ) {
 	var q = cell.attr('q');
 	var r = cell.attr('r');
+	d3.selectAll("g.inner_date").attr("opacity",0.0);
+	d3.select("g.inner_date[q='"+q+"'][r='"+r+"']").attr("opacity",0.7);
 	$("#cell_location").html( `${q}, ${r}` );
 	region = regionsForCell( q, r );// CELLS[q][r];
 	if( region != undefined ) {
@@ -62,7 +64,10 @@ var highlightRegionID = function( id ) {
 
 var clearSel = function() {
 	changeSelectionState( d3.selectAll("polygon.hex_cell"), false );
+	d3.selectAll("g.date").remove();
 }
+
+var gltv = gridLocToVertices;
 
 var selectionAsString = function() {
 	var result = "";
