@@ -251,6 +251,11 @@ function getSelectedCells() {
 function dateStringsFromCell( cell ) {
 	var monthNames = [ "January", "February", "March", "April", "May", "June",
 	    "July", "August", "September", "October", "November", "December" ];
+
+	var month = monthNames[ cell.date.getMonth() ].substring(0,3);
+	var day = cell.date.getDate();
+	return month + " " + day;
+	/*
 	var start_month = monthNames[ cell.begin_date.getMonth() ].substring(0,3)
 	var start_day = cell.begin_date.getDate();
 	var end_month = monthNames[ cell.end_date.getMonth() ].substring(0,3)
@@ -271,6 +276,7 @@ function dateStringsFromCell( cell ) {
 		}
 	}
 	return result;
+	*/
 }
 
 function displayDates( data ) {
@@ -308,7 +314,7 @@ function displayDates( data ) {
 
 	p.append("polygon")
 			.attr("points", points )
-			.attr("fill","yellow")//function(d,i) { return ( i == 0 ? "red" : "green" )})
+			.attr("fill","lightyellow")//function(d,i) { return ( i == 0 ? "red" : "green" )})
 			.attr("stroke","none")
 			.attr("stroke-width",0)
 
@@ -322,18 +328,19 @@ function displayDates( data ) {
 	p.append("text")
 		.classed( "cell_date", "true" )
 		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
-		.attr("y", -2 ) // function(d) {return cellLocToCenter(d).y + 3; })
+		.attr("y", 3 ) // function(d) {return cellLocToCenter(d).y + 3; })
 		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
-		.html( function(d) {return dateStringsFromCell(d)[0];})
+		.html( function(d) {return dateStringsFromCell(d);})
 		.attr("text-anchor","middle")
 
-	p.append("text")
+	/*p.append("text")
 		.classed( "cell_date", "true" )
 		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
 		.attr("y", 10 ) // function(d) {return cellLocToCenter(d).y + 3; })
 		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
 		.html( function(d) {return dateStringsFromCell(d)[1];})
 		.attr("text-anchor","middle")
+	*/
 
 //		.style("filter", "url(#drop-shadow)")
 //		.attr("font-size", 10);

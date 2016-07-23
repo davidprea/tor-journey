@@ -49,15 +49,12 @@ function mapChanged() {
 //	loadRegions();
 }
 
-function loadRemoteMap( filename, display ) {
+function loadRemoteMap( filename ) {
 	var image = new Image();
 	image.onload = function() {
 		map_images[filename] = image;
-//		CURRENT_MAP = filename;
-		$("#" + filename + "_select").prop("checked",true);
-		if( display ) {
-			console.log( "autodisplaying " + filename );
-			displayCurrentMap(); // this should force a redraw and loading of regions...					
+		if( filename == CURRENT_MAP ) {
+			displayCurrentMap(); 					
 		}
 	}
 //	setMapType( ( filename == "valarian_map" ? 1 : 0 ));
@@ -89,11 +86,7 @@ function loadMaps() {
 	$.get( "/mapnames", function(json) {
 		var names = JSON.parse(json);
 		for(var i=0;i<names.length;i++) {
-			if( i == 0 ) {
-				CURRENT_MAP = names[i];
-			}
-			// clearly do not need the 'display' parameter
-			loadRemoteMap(names[i], i == 0 );
+			loadRemoteMap(names[i] );
 		}
 	})
 }

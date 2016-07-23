@@ -1,9 +1,6 @@
 var SHIFTED = false;
 
 $(document).ready( function() {
-	// load other javascript here
-//	$.ajaxSetup({ cache: false });
-
 	loadMaps();
 	loadRegions();
 	loadLocations();
@@ -16,9 +13,6 @@ $(document).ready( function() {
 		$( this ).fadeTo( 0.25, 0.6 );
 	});
 
-	console.log("fading?");
-
-//	setUpBlurFilter();
 })
 
 $(document).on('keyup keydown', function(e){SHIFTED = e.shiftKey} );
