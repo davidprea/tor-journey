@@ -1,12 +1,39 @@
 var REGIONS = null;
 var CELLS = [];
 
+var REGION_TERRAINS =  [{"name":"Easy", "multiplier":1},
+				{"name":"Moderate","multiplier":1.5},
+				{"name":"Hard","multiplier":2},
+				{"name":"Severe","multiplier":3},
+				{"name":"Daunting","multiplier":5},
+				{"name":"Impassable","multiplier":-1}];
+
+
+var REGION_TYPES = [{"name":"Free Lands","tn":12},
+			{"name":"Border Lands","tn":14},
+			{"name":"Wild Lands","blight_freq":7, "tn":16},
+			{"name":"Shadow Lands","blight_freq":1, "tn":18},
+			{"name":"Dark Lands","blight_freq":0.5, "tn":20}];
+
+
 function loadRegions() {
 	$.get( '/regions.json', function( json ) {
 		REGIONS = JSON.parse(json);
 
 		for(var i=0;i<REGIONS.length;i++) {
 			var region = REGIONS[i];
+			for(var j=0;j<REGION_TERRAINS.length;j++) {
+				t = REGION_TERRAINS[j];
+				if( t.name == region.terrain ) {
+					region.terrain = t;
+				}
+			}
+			for(var j=0;j<REGION_TYPES.length;j++) {
+				t = REGION_TYPES[j];
+				if( t.name == region.type ) {
+					region.type = t;
+				}
+			}		
 			for(var j=0;j<region.cells.length;j++){
 				var cell = region.cells[j];
 				if (CELLS[cell.q] == undefined) {

@@ -316,22 +316,17 @@ function displayDates( data ) {
 			.attr("points", points )
 			.attr("fill","lightyellow")//function(d,i) { return ( i == 0 ? "red" : "green" )})
 			.attr("stroke","none")
-			.attr("stroke-width",0)
+			.attr("stroke-width",0);
 
-
-			.append( "text" )
-				.text(function(d,i) {return "hello"})
-				.attr("x", 15 )
-				.attr("y", 15 );
-
-				
 	p.append("text")
 		.classed( "cell_date", "true" )
 		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
 		.attr("y", 3 ) // function(d) {return cellLocToCenter(d).y + 3; })
 		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
 		.html( function(d) {return dateStringsFromCell(d);})
-		.attr("text-anchor","middle")
+		.attr("text-anchor","middle");
+
+
 
 	/*p.append("text")
 		.classed( "cell_date", "true" )
@@ -346,6 +341,40 @@ function displayDates( data ) {
 //		.attr("font-size", 10);
 		
 //	s.exit().remove(); 
+}
+
+function fatigueNotationForCell( cell ) {
+	return cell.region.type.tn + "" + (cell.fatigue_checks > 1 ? "x" + cell.fatigue_checks : "" );
+}
+
+function blightNotationForCell( cell ) {
+	return cell.blight_checks;
+}
+
+function addNotation( cells, text_function, params ) {
+		d3.select( "#overlay")
+		.selectAll( "g." + params.class )
+		.remove();
+
+	var p = d3.select("#overlay")
+		.selectAll("g." + params.class)
+		.data(cells)
+		.enter().append("g")
+			.classed(params.class,true)
+			.attr("q", function(d) { return d.q } )
+			.attr("r", function(d) { return d.r } )
+			.attr( "transform", function(d) { return translateStringForCell(d) } )
+
+
+	p.append("text")
+		.html(text_function )
+		.attr("fill", params.color )
+		.style("font-size", 11 )
+		.style("font-weight", "bold" )
+		.style("font-family", "helvetica")
+		.attr("x", params.x )
+		.attr("y", params.y )
+		.attr("text-anchor","middle");
 }
 
 /* TESTING FUNCTION */

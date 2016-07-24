@@ -24,14 +24,14 @@ function displayCellInfo( cell ) {
 	d3.select("g.inner_date[q='"+q+"'][r='"+r+"']").attr("opacity",0.7);
 	$("#cell_location").html( `${q}, ${r}` );
 	region = regionsForCell( q, r );// CELLS[q][r];
-	if( region != undefined ) {
+	if( region ) {
 		$("#region_count").html( region.length );
 
 		region = region[0];
 		$("#region_id").html( region.id );
 		$("#region_name").html( region.name );
-		$("#region_type").html( region.type );
-		$("#region_terrain").html( region.terrain );
+		$("#region_type").html( region.type.name );
+		$("#region_terrain").html( region.terrain.name );
 	} else {
 		$("#region_id").html( "" );
 		$("#region_name").html( "" );

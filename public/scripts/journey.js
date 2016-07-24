@@ -64,7 +64,7 @@ function reverseJourney() {
 	computeJourney();
 }
 
-function daysPerRoll( month ) {
+function blightFreqForMonth( month ) {
 	switch( month ) {
 		case 11:
 		case 0:
@@ -87,24 +87,6 @@ function daysPerRoll( month ) {
 	return 0;
 }
 
-function getTerrains() {
-	var terrains =  {"Easy":{"multiplier":1, "tn":12},
-					"Moderate":{"multiplier":1.5, "tn":14},
-					"Hard":{"multiplier":2, "tn":16},
-					"Severe":{"multiplier":3, "tn":18},
-					"Daunting":{"multiplier":5, "tn":20},
-					"Impassable":{"multiplier":-1, "tn":0}};
-	return terrains;
-}
-
-function getTypes() {
-	var types = {"Free Lands":{"tn":12},
-				"Border Lands":{"tn":14},
-				"Wild Lands":{"daysperroll":7, "tn":16},
-				"Shadow Lands":{"daysperroll":1, "tn":18},
-				"Dark Lands":{"daysperroll":0.5, "tn":20}};
-	return types;
-}
 
 function computeJourney() {	
 	
@@ -225,10 +207,6 @@ function computeJourney() {
 	}
 
 	/* SET VARIABLES FOR LOOPING */
-	
-	var terrains = getTerrains();
-
-	var types = getTypes();
 
 	
 	journey["total_rolls"] = 0;
@@ -243,21 +221,29 @@ function computeJourney() {
 //	date.setDate( date.getDate() - 1 ); // does this work?
 //	var end_date = new Date(0, month, day );
 	var date_cells = [];
-	var currentDate = new Date( start_date );
 
+	var blight_cells = [];
+	var fatigue_cells = [];
+	var currentDate = new Date( start_date );
+	var blight_meter = 0.0;
+	var fatigue_meter = 0.0;
 	var speed = ( document.getElementById("riding").checked ? 40 : 20 );
 	
+	var currentDate = new Date( start_date );
 	
 	/* SET LEG ATTRIBUTES */
 	/* First time through just set values */
 	
 	var last_day_stamped = -1;
+
+
+
 	for(var i=0;i<journey.length;i++) {
 		var leg = journey[i];
 		leg["days"] = 0;
 //		leg["region"] = regionForId(leg.region_id);
 		
-		if( leg.region.terrain_type == "Impassable" ) {
+		if( leg.region.terrain.name == "Impassable" ) {
 			invalidJourney( "Impassable!" );
 			return;
 		} else if ( !leg.region ) {
@@ -280,29 +266,71 @@ function computeJourney() {
 		}
 		
 		leg["miles"] = 0;
+		leg["fatigue_checks"] = 0;
+		leg["blight_checks"] = 0;
 
 		
 		for(var c=0;c<leg.cells.length;c++) {
 			var cell=leg.cells[c];
+			leg.miles += cell.distance; // this might be only 5
+
+			var starting_days = journey.total_days;
+
+			var apparent_distance = cell.distance * leg.region.terrain.multiplier;
+			var days_to_cross = apparent_distance / speed;
+			journey.total_days += days_to_cross;
+			var full_day_count = Math.floor( journey.total_days );
+			//var additional_full_days = end_day - Math.floor( starting_days );
+			leg.days += days_to_cross;
+
+			var date = new Date( 0, start_month, start_day + full_day_count );
+			cell["date"] = date;
+			var fatigue_freq = blightFreqForMonth( date.getMonth() );
+
+			blight_meter += days_to_cross * 1.0 / cell.region.type.blight_freq;
+			fatigue_meter += days_to_cross * 1.0 / fatigue_freq;
+
+			cell["blight_checks"] = Math.floor( blight_meter );
+			blight_meter -= cell.blight_checks;
+			if( cell.blight_checks > 0 ) {
+				blight_cells.push( cell );
+				leg.blight_checks += cell.blight_checks;
+				journey.total_blight_checks += cell.blight_checks;
+			}
+
+			cell["fatigue_checks"] = Math.floor( fatigue_meter );
+			fatigue_meter -= cell.fatigue_checks;
+			if( cell.fatigue_checks > 0 ) {
+				fatigue_cells.push( cell );
+				leg.fatigue_checks += cell.fatigue_checks;
+				journey.total_rolls += cell.fatigue_checks;
+			}
 
 
-			var rdp = Math.floor( journey.total_days );
-			if( true /* rdp > last_day_stamped */) {
+
+			/*var days_per_blight = c.terrain.type.daysperroll;
+			if(days_per_blight && ) {
+				var rolls =  
+			}*/
+
+
+
+/*			var rdp = Math.floor( journey.total_days );
+			if( true ) {
 				var date = new Date( start_date );
 				date.setDate( date.getDate() + rdp );
 				cell["date"] = date;
 				date_cells.push( cell );
 				last_day_stamped = rdp;
 			}
+*/
+//			var days_per_roll = daysPerRoll( date.getMonth());
+
+
 			
-			leg.miles += cell.distance; // this might be only 5
+//			leg.miles += cell.distance; // this might be only 5
 			// time to cross
-			var apparent_distance = cell.distance * terrains[leg.region.terrain].multiplier;
-			var days_to_cross = apparent_distance / speed;
-			journey.total_days += days_to_cross;
-			leg.days += days_to_cross;
-			var days_per_roll = daysPerRoll( date.getMonth());
-			journey.total_rolls += days_to_cross / days_per_roll;
+//			journey.total_rolls += days_to_cross / days_per_roll;
 /*			var end_days = Math.floor(journey.total_days - begin_days);
 			if( end_days > 0 ) {
 				cell[ "end_date" ] = new Date( 0, start_month, start_day + end_days );
@@ -312,19 +340,25 @@ function computeJourney() {
 			}
 			date_cells.push( cell );
 */
+/*			if(journey.total_days % days_per_roll == 0 ) {
+				cell.fatigue_tn = cell.region.type.tn;
+				fatigue_cells.push(cell);
+			}
+*/
+
 		}
 		
 		journey.total_miles += leg.miles;
 				
 		// corruption checks
-		var type = types[leg.region.type];
-		if( type.daysperroll ) {
-			leg["blight_checks"] = Math.ceil( leg.days / type.daysperroll );
+/*		if( leg.region.type.blight_freq ) {
+			leg["blight_checks"] = Math.ceil( leg.days / leg.region.type.blight_freq );
 			journey.total_blight_checks += leg.blight_checks;
 		}
+*/
 		
 		// travel checks
-		leg["travel_tn"] = types[leg.region.type].tn;
+		leg["travel_tn"] = leg.region.type.tn;
 		
 		// remove locations for now
 				
@@ -351,7 +385,9 @@ function computeJourney() {
 	
 
 	// last, create the date stamps
-	displayDates( date_cells );
+	displayDates( sorted_cells );
+	addNotation( fatigue_cells, fatigueNotationForCell, {"class":"fatigue", "x":0, "y":-6, "color":"#008800"});
+	addNotation( blight_cells, blightNotationForCell, {"class":"blight", "x":0, "y":15, "color":"#880000"});
 	
 	
 	// now build the div
@@ -409,13 +445,6 @@ function recurseResolveRegionsFor( list ) {
 		}
 		recurseResolveRegionsFor( list );
 	} 
-}
-
-
-
-
-function tnForRegion( region ) {
-	return getTerrarins()[region.terrain].tn;
 }
 
 function createJourneyHeaderDiv( journey ) {
