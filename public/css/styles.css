@@ -9,6 +9,28 @@ body {
 	font-family:'alois';
 }
 
+/* cells */
+
+polygon.selected {
+	opacity:0.2;
+	fill: #FFFFE0;
+	stroke: grey;
+	stroke-width: 2;
+}
+
+path.journey {
+	stroke: darkred;
+	opacity: 0.5;
+	stroke-width: 8;
+	fill: none;
+	stroke-dasharray: 12 12;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+	cursor: pointer;
+}
+
+
+
 g.date {
 	cursor: pointer;
 	pointer-events: none;
@@ -280,13 +302,21 @@ li, li > label {
 	color:darkred;
 }
 
+.journey_blight_value {
+	color:darkred;
+}
+
+.journey_fatigue_value {
+	color:#0000FF;
+}
+
 .journey_warning {
 	width: 175px;
 }
 
-.journey_leg_value {
-	color:darkred;
-}
+
+
+
 
 p {
 	line-height:10%;

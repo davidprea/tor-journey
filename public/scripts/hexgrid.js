@@ -443,21 +443,16 @@ function drawJourney( sortedCells ) {
 		.y(function(d) { return d.y; })
 		.interpolate("basis"); 
 
+		d3.select("#overlay").selectAll("path.journey").remove();
 
 
 	var journey = d3.select("svg").append("path")
 		.attr("d", lineFunction(data))
-		.attr("stroke","darkred")
-		.attr("stroke-width",8)
-		.attr("fill","none")
+		.classed("journey",true)
 		.on("mouseenter", mouseEnter )
 		.on("mouseout", mouseOut )
 		.on("mousedown", mouseDown )
 		.on("mouseup", mouseUp )
-		.attr("stroke-linecap","round")
-		.attr("stroke-dasharray","12,12")
-		.attr("stroke-linejoin","round")
-		.style("cursor","pointer")
 }
 
 

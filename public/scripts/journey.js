@@ -28,7 +28,7 @@ function changeSelectionState( selection, selected ) {
 		d3.select("svg").selectAll("text").remove();
 		d3.select("svg").selectAll("path").remove();
 
-		updateAppearance(selection);		
+//		updateAppearance(selection);		
 
 		if( !($("#tagging_mode").prop('checked'))) {
 			computeJourney();
@@ -224,12 +224,12 @@ function computeJourney() {
 
 	var blight_cells = [];
 	var fatigue_cells = [];
-	var currentDate = new Date( start_date );
+//	var currentDate = new Date( start_date );
 	var blight_meter = 0.0;
-	var fatigue_meter = 0.0;
+	var fatigue_meter = 0.01; // start off with a tiny bit to resolve rounding of 1/7
 	var speed = ( document.getElementById("riding").checked ? 40 : 20 );
 	
-	var currentDate = new Date( start_date );
+//	var currentDate = new Date( start_date );
 	
 	/* SET LEG ATTRIBUTES */
 	/* First time through just set values */
@@ -279,7 +279,7 @@ function computeJourney() {
 			var apparent_distance = cell.distance * leg.region.terrain.multiplier;
 			var days_to_cross = apparent_distance / speed;
 			journey.total_days += days_to_cross;
-			var full_day_count = Math.floor( journey.total_days );
+			var full_day_count = Math.floor( journey.total_days - 0.5 );
 			//var additional_full_days = end_day - Math.floor( starting_days );
 			leg.days += days_to_cross;
 
@@ -386,7 +386,7 @@ function computeJourney() {
 
 	// last, create the date stamps
 	displayDates( sorted_cells );
-	addNotation( fatigue_cells, fatigueNotationForCell, {"class":"fatigue", "x":0, "y":-6, "color":"#008800"});
+	addNotation( fatigue_cells, fatigueNotationForCell, {"class":"fatigue", "x":0, "y":-6, "color":"#000088"});
 	addNotation( blight_cells, blightNotationForCell, {"class":"blight", "x":0, "y":15, "color":"#880000"});
 	
 	
@@ -457,7 +457,7 @@ function createJourneyHeaderDiv( journey ) {
 	var title = (start_leg.start ? start_leg.start.name : start_leg.region.name) + " to " + (end_leg.end ? end_leg.end.name : end_leg.region.name );
 	title_label.appendChild( document.createTextNode( title ));
 	div.appendChild( title_label );
-	var labels = ["Total Distance: ","Total Duration: ", "Travel Rolls: ", "Blight Checks: "];
+	var labels = ["Total Distance: ","Total Duration: ", "Fatigue checks: ", "Blight checks: "];
 	var units = ["miles","days","", ""];
 	var values = ["total_miles", "total_days", "total_rolls", "total_blight_checks"];
 	for(var i=0;i<4;i++) {
@@ -468,7 +468,7 @@ function createJourneyHeaderDiv( journey ) {
 		data_label.appendChild( document.createTextNode( labels[i]));
 		data_div.appendChild( data_label );
 		var data_value = document.createElement("label");
-		data_value.className = "journey_summary_value";
+		data_value.className = (values[i] == "total_rolls" ? "journey_fatigue_value" : "journey_summary_value");
 		data_value.appendChild( document.createTextNode( journey[values[i]] + " " + units[i]));
 		data_div.appendChild( data_value );
 		div.appendChild( data_div );
@@ -526,13 +526,13 @@ function createJourneyLegDiv( leg ) {
 	
 	var travel_check_label = document.createElement("div");
 	travel_check_label.className = "journey_leg_entry";
-	travel_check_label.innerHTML = "Travel checks: <span class='journey_leg_value'>" + leg.travel_rolls + "</span> (TN: <span class='journey_leg_value'>" + leg.travel_tn + "</span>)";
+	travel_check_label.innerHTML = "Fatique checks: <span class='journey_fatigue_value'>" + leg.travel_rolls + "</span> (TN: <span class='journey_leg_value'>" + leg.travel_tn + "</span>)";
 	div.appendChild( travel_check_label );
 	
 	if( leg.corruption_rolls ) {
 		var corruption_check_label = document.createElement("div");
 		corruption_check_label.className = "journey_leg_entry";
-		corruption_check_label.innerHTML = "Blight checks: <span class='journey_leg_value'>" + leg.blight_checks + "</span> (TN: <span class='journey_leg_value'>" + leg.corruption_tn + "</span>)";
+		corruption_check_label.innerHTML = "Blight checks: <span class='journey_blight_value'>" + leg.blight_checks + "</span> (TN: <span class='journey_leg_value'>" + leg.corruption_tn + "</span>)";
 		div.appendChild( corruption_check_label );		
 	}
 	
