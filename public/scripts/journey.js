@@ -163,11 +163,11 @@ function computeJourney() {
 		}
 		// moved to sortedCells()
 //		cell["distance"] = 10.0;  
-		if( $("#first_cell_rule_2").prop("checked")) {
+//		if( $("#first_cell_rule_2").prop("checked")) {
 			if( i == 0 || i == sorted_cells.length - 1) {
 				cell.distance = 5.0;
 			}
-		}
+//		}
 		
 		if( !leg ) {
 			leg = {"cells":[]};
@@ -279,25 +279,30 @@ function computeJourney() {
 			var apparent_distance = cell.distance * leg.region.terrain.multiplier;
 			var days_to_cross = apparent_distance / speed;
 			journey.total_days += days_to_cross;
-			var full_day_count = Math.floor( journey.total_days - 0.5 );
+			var full_day_count = Math.floor( journey.total_days );
 			//var additional_full_days = end_day - Math.floor( starting_days );
 			leg.days += days_to_cross;
 
 			var date = new Date( 0, start_month, start_day + full_day_count );
 			cell["date"] = date;
-			var fatigue_freq = blightFreqForMonth( date.getMonth() );
 
-			blight_meter += days_to_cross * 1.0 / cell.region.type.blight_freq;
-			fatigue_meter += days_to_cross * 1.0 / fatigue_freq;
+			/* BLIGHT */
 
-			cell["blight_checks"] = Math.floor( blight_meter );
-			blight_meter -= cell.blight_checks;
-			if( cell.blight_checks > 0 ) {
-				blight_cells.push( cell );
-				leg.blight_checks += cell.blight_checks;
-				journey.total_blight_checks += cell.blight_checks;
+			if( cell.region.type.blight_freq) {
+				blight_meter += days_to_cross * 1.0 / cell.region.type.blight_freq;
+				cell["blight_checks"] = Math.floor( blight_meter );
+				blight_meter -= cell.blight_checks;
+				if( cell.blight_checks > 0 ) {
+					blight_cells.push( cell );
+					leg.blight_checks += cell.blight_checks;
+					journey.total_blight_checks += cell.blight_checks;
+				}				
 			}
 
+			/* FATIGUE */
+
+			var fatigue_freq = blightFreqForMonth( date.getMonth() );
+			fatigue_meter += days_to_cross * 1.0 / fatigue_freq;
 			cell["fatigue_checks"] = Math.floor( fatigue_meter );
 			fatigue_meter -= cell.fatigue_checks;
 			if( cell.fatigue_checks > 0 ) {
