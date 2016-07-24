@@ -9,8 +9,8 @@ function drawGrid() {
 		var hex_data = [];
 	}
 		
-	var columns = ($("#map").width() - (2 * MAP_BORDER.x)) / HEX_SCALE.x * 0.66;
-	var rows = ($("#map").height() - (2 * MAP_BORDER.y)) / HEX_SCALE.y * 0.555 + 1;
+	var columns = ($("#map").width() - (2 * currentMap().border.x)) / currentMap().scale.x * 0.66;
+	var rows = ($("#map").height() - (2 * currentMap().border.y)) / currentMap().scale.y * 0.555 + 1;
 	
 
 	for(var q=1;q<columns;q++) {
@@ -37,7 +37,7 @@ function pointToVertices( point ) {
 */
 
 function cellLocToCenter( cell ) {
-	var loc = {"q": cell.q - MAP_OFFSET.q, "r": cell.r - MAP_OFFSET.r};
+	var loc = {"q": cell.q - currentMap().origin.q, "r": cell.r - currentMap().origin.r};
 	var point = gridLocToCenter( loc );
 	return point;
 }
@@ -48,15 +48,15 @@ function translateStringForCell( cell ) {
 }
 
 function gridLocToCenter( loc ) {
-	var xpos = Math.floor( HEX_SCALE.x * 3 / 2 * loc.q  + MAP_BORDER.x + CELL_OFFSET.x );
-	var stagger = (loc.q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step;
-	var ypos = Math.floor( HEX_SCALE.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + MAP_BORDER.y + CELL_OFFSET.y );
+	var xpos = Math.floor( currentMap().scale.x * 3 / 2 * loc.q  + currentMap().border.x + currentMap().offset.x );
+	var stagger = (loc.q + currentMap().parity) % 2 * currentMap().step;
+	var ypos = Math.floor( currentMap().scale.y * Math.sqrt(3) * (loc.r + stagger + (loc.q % 2 / 2.0)) + currentMap().border.y + currentMap().offset.y );
 	return {'x':xpos, 'y':ypos };
 }
 
 function gridLocToVertices( location, scale ) {
 	var center = gridLocToCenter( location );
-	var radius = scale * HEX_SCALE.x; // this still gets multiplied for every cell
+	var radius = scale * currentMap().scale.x; // this still gets multiplied for every cell
 
 	if( hex_offsets.length == 0 ) {
 		for(var v=0;v<6;v++) {
@@ -77,20 +77,21 @@ function gridLocToVertices( location, scale ) {
 }
 
 function pointToGrid( point ) {
-	var adjx = point.x - (MAP_BORDER.x + CELL_OFFSET.x);
-	var adjy = point.y - (MAP_BORDER.y + CELL_OFFSET.y);
-	var q = Math.round((2.0 * adjx / 3) / HEX_SCALE.x);
-	var stagger = (q + MAP_STAGGER.parity) % 2 * MAP_STAGGER.step
+	var adjx = point.x - (currentMap().border.x + currentMap().offset.x);
+	var adjy = point.y - (currentMap().border.y + currentMap().offset.y);
+	var q = Math.round((2.0 * adjx / 3) / currentMap().scale.x);
+	var stagger = (q + currentMap().parity) % 2 * currentMap().step
 //	var r = (1.0/3 * Math.sqrt(3) * adjy - 1.0 / 3 * adjx) / HEX_SCALE.y;
-	var r = (adjy / (HEX_SCALE.y * Math.sqrt(3))) - (q%2/2.0) - stagger;
+	var r = (adjy / (currentMap().scale.y * Math.sqrt(3))) - (q%2/2.0) - stagger;
 	var grid = { 'q': q, 'r': Math.round(r)};
 	return grid;
 }
 
 function pointToCoords( point ) {
 	var grid = pointToGrid( {"x":point[0], "y":point[1]} );
-	var q = grid.q + MAP_OFFSET.q;
-	var r = grid.r + MAP_OFFSET.r;
+//	console.log( typeof currentMap().origin.q );
+	var q = grid.q + currentMap().origin.q;
+	var r = grid.r + currentMap().origin.r;
 	result = {"q":q, "r":r};
 	return result;
 }
@@ -105,8 +106,8 @@ function drawHexes( data ) {
 		.data( data )
 		.enter().append("polygon")
 			.attr("points", function(d) {return gridLocToVertices(d,0.9);})
-			.attr("q", function(d) {return d.q + MAP_OFFSET.q})
-			.attr("r", function(d) {return d.r + MAP_OFFSET.r})
+			.attr("q", function(d) {return d.q + currentMap().origin.q})
+			.attr("r", function(d) {return d.r + currentMap().origin.r})
 	//		.attr("region_id", function(d) {return regionIdForCell(d);})
 			.attr("stroke", "transparent" )
 			.attr("stroke-width", 1 )
@@ -304,7 +305,7 @@ function displayDates( data ) {
 
 	// build points string
 	var center = { "x": 0, "y": 0 };
-	var radius = HEX_SCALE.y * 0.9	
+	var radius = currentMap().scale.y * 0.9	
 	var points = "";
 	for(var v=0;v<6;v++) {
 		var x1 = center.x + (hex_offsets[v].dx * radius);
@@ -322,7 +323,7 @@ function displayDates( data ) {
 		.classed( "cell_date", "true" )
 		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
 		.attr("y", 3 ) // function(d) {return cellLocToCenter(d).y + 3; })
-		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
+		.attr("font-size", function() {return currentMap().scale.y / 2;} )
 		.html( function(d) {return dateStringsFromCell(d);})
 		.attr("text-anchor","middle");
 

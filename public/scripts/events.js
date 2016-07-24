@@ -107,10 +107,12 @@ function mouseUp( d ) {
 
 function changeMap( radioButton ) {
 	selection = getSelectedCells();
-	CURRENT_MAP = radioButton.getAttribute( "map_name") + ".jpg";
+	CURRENT_MAP = parseInt( radioButton.getAttribute( "map_index"));
 	displayCurrentMap();
+	
 	for(var i=0;i<SELECTED_CELLS.length;i++) {
 		var cell=SELECTED_CELLS[i];
 		changeSelectionState( cellAtCoords( cell.q, cell.r ), true );
 	}
+	
 }

@@ -39,8 +39,8 @@ function changeSelectionState( selection, selected ) {
 }
 
 function isValidCell( cell ) {
-	var q = cell.q + MAP_OFFSET.q;
-	var r = cell.r + MAP_OFFSET.r;
+	var q = cell.q + currentMap().origin.q;
+	var r = cell.r + currentMap().origin.r;
 	return (CELLS[q] && CELLS[q][r] ) 
 }
 

@@ -47,6 +47,32 @@ def getLocations
 	return results
 end
 
+def getMapInfo
+	results = [];
+	file = File.open("map_info.csv","r")
+	headings = file.readline().strip().split(",")
+	file.each_line do | line |
+		entry = {};
+		values = line.strip().split(",")
+		values.each_with_index do | val, i |
+			if /\A\d+\z/.match(val)
+				entry[headings[i]] = val.to_i
+			elsif val.to_f.to_s == val 
+				entry[headings[i]] = val.to_f
+			else
+				entry[headings[i]] = val
+			end
+		end
+		results.push entry
+	end
+	file.close
+	return results
+end	
+
+get '/mapinfo.json' do
+	getMapInfo.to_json
+end
+
 get '/regions.json' do
 	#getRegions.to_json
 	getRegions.to_json

@@ -26,9 +26,9 @@
 -#%p
 %fieldset
 	%legend Map
-	-["Eriador", "Wilderland", "Mordor", "Rohan and Gondor"].each_with_index do |name,index| 
-		%input{ :type => 'radio', :checked => (index==0), :onchange => 'changeMap(this)', :name => 'map', :map_name => name.gsub(/[-\s]/,'_').downcase, :id => "#{name.gsub(/[-\s]/,'_').downcase}_select" }
-		=name
+	-getMapInfo().each_with_index do |map,index| 
+		%input{ :type => 'radio', :checked => (index==0), :onchange => 'changeMap(this)', :name => 'map', :map_index => index, :id => "map_select_#{index}" }
+		=map["name"]
 		-#%input.fileload{ :type => 'file', :map_name => name.gsub(/[-\s]/,'_').downcase, :multiple => false, :onchange => "load_map(this)" }
 		%p
 
