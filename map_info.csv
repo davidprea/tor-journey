@@ -1,5 +1,5 @@
 name,filename,border_x,border_y,offset_x,offset_y,scale_x,scale_y,origin_x,origin_y,parity,step
 Eriador,eriador.jpg,151,134,-0.7,0.3,22.462,22.4,0,0,0,0
 Wilderland,wilderland.jpg,172,132,-0.7,0.3,22.462,22.4,63,1,1,1
-Rohan and Gondor,rohan_and_gondor.jpg,175,348,-0.7,0.3,22.462,22.4,28,49,0,0
+Rohan and Gondor,rohan_and_gondor.jpg,175,148,-0.7,0.3,22.462,22.4,28,49,0,0
 Mordor,mordor.jpg,175,148,-0.7,0.3,22.462,22.4,76,65,0,0
