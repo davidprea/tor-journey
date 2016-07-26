@@ -216,7 +216,7 @@ function revertAllCells() {
 	changeSelectionState( d3.selectAll(".hex_cell"), false );
 }
 
-function neighborsOf( cell ) { 
+function neighborsOfCell( cell ) { 
 	result = [];
 	var q = parseInt( cell.attr("q"));
 	var r = parseInt( cell.attr("r"));
@@ -236,7 +236,7 @@ function neighborsOf( cell ) {
 function fillCells( cell, mode ) {  // selection should be a single cell
 	changeSelectionState( cell, mode );
 	var offset = ( cell.q % 2 == 0 ? -1 : 0 );
-	var neighbors = neighborsOf( cell );
+	var neighbors = neighborsOfCell( cell );
 	for(var i=0;i<neighbors.length;i++) {
 		var neighbor = neighbors[i];
 		if( neighbor.classed("selected") != mode ) {
@@ -362,6 +362,7 @@ function addNotation( cells, text_function, params ) {
 		.data(cells)
 		.enter().append("g")
 			.classed(params.class,true)
+			.classed("notation", true)
 			.attr("q", function(d) { return d.q } )
 			.attr("r", function(d) { return d.r } )
 			.attr( "transform", function(d) { return translateStringForCell(d) } )
@@ -370,9 +371,6 @@ function addNotation( cells, text_function, params ) {
 	p.append("text")
 		.html(text_function )
 		.attr("fill", params.color )
-		.style("font-size", 11 )
-		.style("font-weight", "bold" )
-		.style("font-family", "helvetica")
 		.attr("x", params.x )
 		.attr("y", params.y )
 		.attr("text-anchor","middle");
@@ -403,32 +401,6 @@ function numberCells(cells) {
 			.on("mouseup", mouseUp );
 
 
-/*
-
-	d3.select( "#overlay" )
-		.selectAll("text")
-		.remove();
-	
-	var s = d3.select( "#overlay" )
-		.selectAll( "text" )
-		.data(cells);
-				
-	s.enter().append("text")
-		.classed( "cell_date", "true" )
-		.attr("x", function(d) {return cellLocToCenter(d).x; })
-		.attr("y", function(d) {return cellLocToCenter(d).y + 3; })
-		.attr("font-size", function() {return HEX_SCALE.y / 2;} )
-		.text( function(d,i) {return i;})
-		.on("mouseenter", mouseEnter )
-		.on("mouseout", mouseOut )
-		.on("mousedown", mouseDown )
-		.on("mouseup", mouseUp )
-		.attr("text-anchor","middle");
-//		.attr("stroke", "saddlebrown" )
-//		.attr("font-size", 10);
-		
-	s.exit().remove();
-*/
 }
 
 function drawJourney( sortedCells ) {

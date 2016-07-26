@@ -18,17 +18,18 @@ function changeSelectionState( selection, selected ) {
 					SELECTED_CELLS.splice(index,1);
 				} else if ( selected && index == -1 ) {
 					SELECTED_CELLS.push( {"q":parseInt(cell.attr('q')), "r":parseInt(cell.attr('r'))} );
-				}
+				}					
 			}
-
-		}
+		
+		} 
 	})
 
 	if( changed == true ) {
-		d3.select("svg").selectAll("text").remove();
-		d3.select("svg").selectAll("path").remove();
+		d3.select("svg").selectAll("g.notation").remove();
+		d3.select("svg").selectAll("path.journey").remove();
+		d3.select("svg").selectAll("g.date").remove();
 
-//		updateAppearance(selection);
+//		updateAppearance(selection);		
 
 		if( !($("#tagging_mode").prop('checked'))) {
 			computeJourney();
@@ -41,7 +42,7 @@ function changeSelectionState( selection, selected ) {
 function isValidCell( cell ) {
 	var q = cell.q + currentMap().origin.q;
 	var r = cell.r + currentMap().origin.r;
-	return (CELLS[q] && CELLS[q][r] )
+	return (CELLS[q] && CELLS[q][r] ) 
 }
 
 
@@ -88,12 +89,12 @@ function blightFreqForMonth( month ) {
 }
 
 
-function computeJourney() {
-
+function computeJourney() {	
+	
 	/*if( EDITING_MODE == true ) {
-		return;
+		return; 
 	}*/
-
+	
 //	deleteDates();
 
 	if( SELECTED_CELLS.length < 2 ) {
@@ -101,17 +102,17 @@ function computeJourney() {
 	} else {
 		$( "#tabs" ).tabs( "option", "active", 1 );
 	}
-
+	
 	var sorted_cells = sortedCellsNew();
 
 	if( sorted_cells == -1 ) {
 		return;
 	}
-
+	
 	if( $("#first_cell_rule_1").prop("checked")) {
 		sorted_cells.splice(0,1); // delete first cell
 	}
-
+	
 	if( sorted_cells == "Discontiguous")  {
 		invalidJourney( "Discontiguous Path");
 		return
@@ -125,7 +126,7 @@ function computeJourney() {
 
 	// draw the journey path
 	drawJourney( sorted_cells );
-	//numberCells( sorted_cells );
+	//numberCells( sorted_cells );		
 
 
 	/* RESOLVE REGIONS */
@@ -145,10 +146,9 @@ function computeJourney() {
 
 		}
 	}*/
-
+	
 
 	/* DIVIDE INTO LEGS */
-	/* This can be done concurrently with calculating dates and rolls */
 
 	var journey = [];
 	var leg = null;
@@ -163,13 +163,13 @@ function computeJourney() {
 			return;
 		}
 		// moved to sortedCells()
-//		cell["distance"] = 10.0;
+//		cell["distance"] = 10.0;  
 //		if( $("#first_cell_rule_2").prop("checked")) {
 			if( i == 0 || i == sorted_cells.length - 1) {
 				cell.distance = 5.0;
 			}
 //		}
-
+		
 		if( !leg ) {
 			leg = {"cells":[]};
 			leg["region"] = cell.region;
@@ -204,17 +204,17 @@ function computeJourney() {
 	}
 	// and the final leg...
 	if( leg ) {
-		journey.push( leg );
+		journey.push( leg );		
 	}
 
 	/* SET VARIABLES FOR LOOPING */
 
-
+	
 	journey["total_rolls"] = 0;
 	journey["total_blight_checks"] = 0;
 	journey["total_miles"] = 0;
 	journey["total_days"] = 0;
-
+	
 	/* DATES */
 	var start_month = parseInt( document.getElementById( "startmonth" ).value );
 	var start_day = parseInt( document.getElementById( "startday" ).value );
@@ -229,12 +229,12 @@ function computeJourney() {
 	var blight_meter = 0.0;
 	var fatigue_meter = 0.01; // start off with a tiny bit to resolve rounding of 1/7
 	var speed = ( document.getElementById("riding").checked ? 40 : 20 );
-
+	
 //	var currentDate = new Date( start_date );
-
+	
 	/* SET LEG ATTRIBUTES */
 	/* First time through just set values */
-
+	
 	var last_day_stamped = -1;
 
 
@@ -243,7 +243,7 @@ function computeJourney() {
 		var leg = journey[i];
 		leg["days"] = 0;
 //		leg["region"] = regionForId(leg.region_id);
-
+		
 		if( leg.region.terrain.name == "Impassable" ) {
 			invalidJourney( "Impassable!" );
 			return;
@@ -251,12 +251,12 @@ function computeJourney() {
 			invalidJourney( "Outside the Lines");
 			return;
 		}
-
+		
 		// position
-
+		
 		if( i == 0 ) {
 			if( journey.length > 1 ) {
-				leg["position"] = "first";
+				leg["position"] = "first";				
 			} else {
 				leg["position"] = "only";
 			}
@@ -265,12 +265,12 @@ function computeJourney() {
 		} else {
 			leg["position"] = "middle";
 		}
-
+		
 		leg["miles"] = 0;
 		leg["fatigue_checks"] = 0;
 		leg["blight_checks"] = 0;
 
-
+		
 		for(var c=0;c<leg.cells.length;c++) {
 			var cell=leg.cells[c];
 			leg.miles += cell.distance; // this might be only 5
@@ -297,7 +297,7 @@ function computeJourney() {
 					blight_cells.push( cell );
 					leg.blight_checks += cell.blight_checks;
 					journey.total_blight_checks += cell.blight_checks;
-				}
+				}				
 			}
 
 			/* FATIGUE */
@@ -316,7 +316,7 @@ function computeJourney() {
 
 			/*var days_per_blight = c.terrain.type.daysperroll;
 			if(days_per_blight && ) {
-				var rolls =
+				var rolls =  
 			}*/
 
 
@@ -333,7 +333,7 @@ function computeJourney() {
 //			var days_per_roll = daysPerRoll( date.getMonth());
 
 
-
+			
 //			leg.miles += cell.distance; // this might be only 5
 			// time to cross
 //			journey.total_rolls += days_to_cross / days_per_roll;
@@ -353,34 +353,34 @@ function computeJourney() {
 */
 
 		}
-
+		
 		journey.total_miles += leg.miles;
-
+				
 		// corruption checks
 /*		if( leg.region.type.blight_freq ) {
 			leg["blight_checks"] = Math.ceil( leg.days / leg.region.type.blight_freq );
 			journey.total_blight_checks += leg.blight_checks;
 		}
 */
-
+		
 		// travel checks
 		leg["travel_tn"] = leg.region.type.tn;
-
+		
 		// remove locations for now
-
-
+				
+		
 		if(i == journey.length - 1) { // this is the last leg
 			var end_cell = leg.cells[leg.cells.length - 1];
 		}
 	}
 
-
+	
 	journey.total_rolls = Math.ceil( journey.total_rolls );
-
+	
 	if( journey.length > 1 ) {
 		journey[0]["next"] = journey[1].region.name;
 	}
-
+	
 	var leftover = 0;
 	for(var i=0;i<journey.length;i++) {
 		var leg = journey[i];
@@ -388,17 +388,17 @@ function computeJourney() {
 		leg.travel_rolls = Math.round( rolls );
 		leftover = rolls - leg.travel_rolls;
 	}
-
+	
 
 	// last, create the date stamps
 	displayDates( sorted_cells );
 	addNotation( fatigue_cells, fatigueNotationForCell, {"class":"fatigue", "x":0, "y":-6, "color":"#000088"});
 	addNotation( blight_cells, blightNotationForCell, {"class":"blight", "x":0, "y":15, "color":"#880000"});
-
-
+	
+	
 	// now build the div
 	$("#journey div").remove();
-
+	
 	// first the header
 	document.getElementById("journey").appendChild( createJourneyHeaderDiv(journey) );
 
@@ -447,10 +447,10 @@ function recurseResolveRegionsFor( list ) {
 	}
 	if( resolved < list.length ) {
 		if (changed == 0) {
-			list[0].region = list[0].regions[0];
+			list[0].region = list[0].regions[0];			
 		}
 		recurseResolveRegionsFor( list );
-	}
+	} 
 }
 
 function createJourneyHeaderDiv( journey ) {
@@ -524,24 +524,24 @@ function createJourneyLegDiv( leg ) {
 	}
 	title_label.appendChild( document.createTextNode( title ));
 	div.appendChild( title_label );
-
+	
 	var distance_label = document.createElement("div");
 	distance_label.className = "journey_leg_entry";
 	distance_label.innerHTML = "<span class='journey_leg_value'>" + leg.miles + "</span> miles, " + "<span class='journey_leg_value'>" + leg.days + "</span> days";
 	div.appendChild( distance_label );
-
+	
 	var travel_check_label = document.createElement("div");
 	travel_check_label.className = "journey_leg_entry";
 	travel_check_label.innerHTML = "Fatique checks: <span class='journey_fatigue_value'>" + leg.travel_rolls + "</span> (TN: <span class='journey_leg_value'>" + leg.travel_tn + "</span>)";
 	div.appendChild( travel_check_label );
-
+	
 	if( leg.corruption_rolls ) {
 		var corruption_check_label = document.createElement("div");
 		corruption_check_label.className = "journey_leg_entry";
 		corruption_check_label.innerHTML = "Blight checks: <span class='journey_blight_value'>" + leg.blight_checks + "</span> (TN: <span class='journey_leg_value'>" + leg.corruption_tn + "</span>)";
-		div.appendChild( corruption_check_label );
+		div.appendChild( corruption_check_label );		
 	}
-
+	
 	/*
 	var l_keys = Object.keys(leg.loi);
 	if( l_keys.length > 0 ) {
@@ -555,10 +555,10 @@ function createJourneyLegDiv( leg ) {
 		}
 		html = html.substring( 0, html.length - 2 );
 		loi.innerHTML = html
-		div.appendChild( loi );
+		div.appendChild( loi );				
 	}
 	*/
-
+	
 	return div;
 }
 
@@ -578,89 +578,6 @@ function createTableRow( arrayOfElements ) {
 
 /**** PATH TRAVERSAL ******/
 
-function findLongestPath( list ) {
-	var pool = list.slice();
-	var paths = [];
-//	var max_length = 0;
-//	var max_index = 0;
-	while( pool.length > 0 ) {
-		var result = findLongestSegment( pool );
-		paths.push( result.path );
-		pool = result.leftover;
-	}
-
-	/* now try to splice pieces together */
-
-	for(var i=0;i<paths.length-1;i++) {
-		var frag1 = paths[i];
-		for(var j=i;j<paths.length;j++) {
-			var frag2 = paths[j];
-			var join = spliceFragments( frag1, frag2 );
-			if( join ) {
-				paths[i] = join;
-				paths.splice(j,1);
-				j--;
-			}
-		}
-	}
-	
-	/* NOW find longest.... */
-	var l_index = 0;
-	for(var i=0;i<paths.length;i++) {
-		if( paths[i].length > paths[l_index].length) {
-			l_index = i;
-		}
-	}
-
-	return paths[l_index];
-}
-
-function spliceFragments( frag1, frag2 ) {
-	var f1b = frag1[0];
-	var f1e = frag1[frag1.length-1];
-	var f2b = frag2[0];
-	var f2e = frag2[frag2.length-1];
-
-	if( cellsAdjacent(f1e,f2b)) {
-		return frag1.concat( frag2 );
-	} else if (cellsAdjacent(f1e,f2e)) {
-		return frag1.concat( frag2.reverse() );
-	} else if( cellsAdjacent(f1b,f2e)) {
-		return frag2.concat( frag1 );
-	} else if (cellsAdjacent(f1b,f2b)) {
-		return frag1.reverse().concat( frag2 );
-	}
-	return null;
-}
-
-function findLongestSegment( list, index = 0 ) {
-	var pool = list.slice();
-	var cell = pool.splice(index,1)[0];
-
-	var result = {"leftover": pool, "path": [cell]};
-	var neighbors = neighborsOf( cell, pool );
-
-	var path_found = [];
-	for(var i=0;i<neighbors.length;i++) {
-		var n_index = pool.indexOf( neighbors[i] );
-		if( n_index == -1 ) {
-			debugger;
-		}
-		longest = findLongestSegment( pool, n_index );
-		l1 = path_found.length;
-		l2 = longest.path.length;
-		if( l2 > l1 || (l1 == l2 && (path_found[0].index > longest.path.index ))) {
-			path_found = longest.path;
-			result.leftover = longest.leftover;
-		}	
-	}
-
-	result.path = result.path.concat( path_found );
-
-	return result;
-}
-
-
 function sortedCellsNew() {
 
 	var cells = [];
@@ -676,23 +593,11 @@ function sortedCellsNew() {
 		cells.push(new_cell);
 	}
 
-
-	var path = findLongestPath( cells.slice() );
-//	console.log(path.leftover);
-	return path;
-
-/*	console.log( longestChain );
-	if( true ) return;
-
-	if(collectContiguous(cells).length != cells.length) {
-		console.log( "discontiguous" );
-		return -1;
+	var ordered_cells = startChain( cells );
+	if( ordered_cells == -1 ) {
+		return ordered_cells;
 	}
 
-
-	var ordered_cells = startChain( cells );
-
-*/
 
 	// check for order...should be able to fix this inside startChain
 /*	for(var i=0;i<ordered_cells.length;i++) {
@@ -705,54 +610,31 @@ function sortedCellsNew() {
 		}
 	}
 */
-/*
+	
 	if( document.getElementById( "reverse_direction").checked ) {
 		ordered_cells = ordered_cells.reverse();
 	}
 
 	ordered_cells[ordered_cells.length - 1]["isFinal"] = true;
-
-
+	
 	return ordered_cells;
-
-*/
-}
-
-function collectContiguous( pool, cell = null ) {
-	var result = []
-	var temp_pool = pool;
-	if( cell == null ) {
-		cell = pool[0]
-		temp_pool = pool.slice();
-	}
-	temp_pool.splice( temp_pool.indexOf( cell ), 1 );
-	result.push( cell );
-	var neighbors = neighborsOf( cell, temp_pool );
-	for(var i=0;i<pool.length;i++) {
-		var neighbor = neighbors[i];
-		if( neighbor ) {
-			result = result.concat( collectContiguous( temp_pool, neighbor ));			
-		}
-	}
-	return result;
 }
 
 function startChain( cells ) {
 	// clone the array...
 	var pool = cells.slice();
-	var first_clicked = pool[0];
 	// first find a cell...any cell...with only a single neighbor
 	var ends = getEndCellsFromPool( pool );
 	var first;
 	if( ends.length < 1 ) {
 		console.log("no ends");
 		first = firstCellClicked(pool);
-		// ok what I want to do here is start *somewhere*, work to the end, and then
-		// start over again using that end....
 //		first = firstClicked( pool );
 	} else {
-		// just start with an end...can reverse later
 		first = ends[0];
+		for(var i=1;i<ends.length;i++) {
+			first = closestToStart( first, ends[i], cells );
+		}
 	}
 
 	if( first == undefined ) {
@@ -762,46 +644,33 @@ function startChain( cells ) {
 	// remove it from pool
 	pool.splice( pool.indexOf(first),1);
 
-	var result = growChain( first, pool );
-
-	// check to see if the beginning grew more than the end
-	var first_index = result.indexOf( first_clicked );
-	if( first_index > result.length / 2 ) {
-		return result.reverse();
-	} else {
-		return result;
-	}
+	return growChain( first, pool ); 
 }
 
-/*function closestToStart( cell1, cell2, pool ) {
-	console.log( pool[0] );
+function closestToStart( cell1, cell2, pool ) {
 	var d1 = distanceFromFirstClicked( cell1, pool );
-	console.log(cell1.q + ", " + cell1.r + ": " + d1);
 	var d2 = distanceFromFirstClicked( cell2, pool );
-	console.log(cell2.q + ", " + cell2.r + ": " + d2);
 	return( d1 < d2 ? cell1 : cell2 );
 }
 
 function distanceFromFirstClicked( cell, pool ) {
-	var first_clicked = pool[0];
-	var diffq =
-	var diffr = pool.indexOf( pool[0]); // that's a little inefficient
-	return Math.sqrt( pos1 - pos2 );
+	var pos1 = pool.indexOf(cell);
+	var pos2 = pool.indexOf( firstCellClicked(pool)); // that's a little inefficient
+	return Math.abs( pos1 - pos2 );
 }
 
 function firstCellClicked( pool ) {
-	var index = 1000;
+	var index = -1;
 	for(var i=0;i<pool.length;i++){
-		master_index = SELECTED_CELLS.indexOf( pool[i] );
-		if( master_index < index ) {
+		if( index < 0 || pool[i].index < index ) {
 			index = i;
 		}
 	}
 	return pool[index];
-}*/
+}
 
 function growChain( base, pool ) {
-	var neighbors = neighborsOf( base, pool );
+	var neighbors = selectedNeighborsOf( base, pool );
 	if( neighbors.length < 1 ) {
 		a = new Array();
 		a[0] = base;
@@ -821,12 +690,12 @@ function growChain( base, pool ) {
 	for(var i=0;i<neighbors.length;i++) {
 		var neighbor = neighbors[i];
 		var index = pool.indexOf( neighbor );
-		var new_pool = pool.slice();
+		var new_pool = pool.slice();		
 		new_pool.splice(index,1);
 		chains[i] = growChain( neighbor, new_pool );
 		if( max_chain < 0 || chains[max_chain].length < chains[i].length ) {
 			max_chain = i;
-		} /*
+		} /* 
 		This isn't working...it's supposed to solve equal length chains by choosing the one that starts with the lowest index
 		else if (chains[max_chain].length == chains[i].length ) {
 			// if they are same length, find the lower index
@@ -843,14 +712,14 @@ function growChain( base, pool ) {
 function getEndCellsFromPool( pool ) {
 	var result = [];
 	for(var i=0;i<pool.length;i++) {
-		if( neighborsOf(pool[i], pool).length == 1 ) {
+		if( selectedNeighborsOf(pool[i], pool).length == 1 ) {
 			result.push( pool[i] );
 		}
 	}
 	return result;
 }
 
-function neighborsOf( cell, pool ) {
+function selectedNeighborsOf( cell, pool ) {
 	var neighbors = [];
 	for(var i=0;i<pool.length;i++) {
 		if( cellsAdjacent( cell, pool[i] )) {
@@ -874,7 +743,7 @@ function cellsAdjacent( cell1, cell2 ) {
 	var o = cell1.q % 2;
 	var deltas = [{"q":-1,"r":(-1 + o)},{"q":0,"r":-1},{"q":1,"r":(-1 + o)},
 					{"q":-1,"r":(0 + o)},{"q":0,"r":1},{"q":1,"r":(0 + o)}];
-
+					
 	for(var i=0;i<deltas.length;i++) {
 		var dq = deltas[i].q;
 		var dr = deltas[i].r;
@@ -885,3 +754,6 @@ function cellsAdjacent( cell1, cell2 ) {
 
 	return false;
 }
+
+
+
