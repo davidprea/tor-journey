@@ -106,7 +106,7 @@ function computeJourney() {
 	var sorted_cells = sortedCellsNew();
 
 	if( sorted_cells.length > 1 ) {
-		addNotation( SELECTED_CELLS, function(d,i) {return `#${i}`}, {"class":"number", "x":0, "y":4, "color":"#EE0000"});
+		addNotation( SELECTED_CELLS, function(d,i) {return `#${i+1}`}, {"class":"number", "x":0, "y":4, "color":"#AA0000"});
 		return;
 	} else {
 		sorted_cells = sorted_cells[0];
