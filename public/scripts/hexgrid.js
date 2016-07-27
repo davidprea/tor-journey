@@ -400,6 +400,12 @@ function numberCells(cells) {
 			.on("mousedown", mouseDown )
 			.on("mouseup", mouseUp );
 
+	p.append("text")
+		.attr("x", 0 )
+		.attr("y", 0 )
+		.attr("fill", "black" )
+		.attr("text-anchor","middle")
+		.html( function(d,i) { return i });
 
 }
 

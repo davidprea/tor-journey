@@ -95,6 +95,7 @@ function computeJourney() {
 	}*/
 
 //	deleteDates();
+	clearSummary();
 
 	if( SELECTED_CELLS.length < 2 ) {
 		return;
@@ -104,8 +105,11 @@ function computeJourney() {
 
 	var sorted_cells = sortedCellsNew();
 
-	if( sorted_cells == -1 ) {
+	if( sorted_cells.length > 1 ) {
+		addNotation( SELECTED_CELLS, function(d,i) {return `#${i}`}, {"class":"number", "x":0, "y":4, "color":"#EE0000"});
 		return;
+	} else {
+		sorted_cells = sorted_cells[0];
 	}
 
 	if( $("#first_cell_rule_1").prop("checked")) {
@@ -394,18 +398,25 @@ function computeJourney() {
 	displayDates( sorted_cells );
 	addNotation( fatigue_cells, fatigueNotationForCell, {"class":"fatigue", "x":0, "y":-6, "color":"#000088"});
 	addNotation( blight_cells, blightNotationForCell, {"class":"blight", "x":0, "y":15, "color":"#880000"});
+	createJourneySummary(journey);
+}
+
+function createJourneySummary(journey) {
 
 
 	// now build the div
-	$("#journey div").remove();
 
 	// first the header
-	document.getElementById("journey").appendChild( createJourneyHeaderDiv(journey) );
+	document.getElementById("journey_summary").appendChild( createJourneyHeaderDiv(journey) );
 
 	for(var i=0;i<journey.length;i++) {
 		var leg = journey[i];
-		document.getElementById("journey").appendChild( createJourneyLegDiv( leg ) );
+		document.getElementById("journey_summary").appendChild( createJourneyLegDiv( leg ) );
 	}
+}
+
+function clearSummary() {
+		$("#journey_summary div").remove();
 }
 
 function resolveRegionsFor( list ) {
@@ -578,7 +589,7 @@ function createTableRow( arrayOfElements ) {
 
 /**** PATH TRAVERSAL ******/
 
-function findLongestPath( list ) {
+function findContiguousPaths( list ) {
 	var pool = list.slice();
 	var paths = [];
 //	var max_length = 0;
@@ -605,14 +616,14 @@ function findLongestPath( list ) {
 	}
 	
 	/* NOW find longest.... */
-	var l_index = 0;
+	/*var l_index = 0;
 	for(var i=0;i<paths.length;i++) {
 		if( paths[i].length > paths[l_index].length) {
 			l_index = i;
 		}
-	}
+	}*/
 
-	return paths[l_index];
+	return paths;
 }
 
 function spliceFragments( frag1, frag2 ) {
@@ -677,8 +688,9 @@ function sortedCellsNew() {
 	}
 
 
-	var path = findLongestPath( cells.slice() );
+	var path = findContiguousPaths( cells.slice() );
 //	console.log(path.leftover);
+//	a -1 means it couldn't find a single path using all cells
 	return path;
 
 /*	console.log( longestChain );
