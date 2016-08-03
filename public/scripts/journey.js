@@ -70,7 +70,7 @@ function sortCells() {
 }
 
 function markFirst() {
-	d3.selectAll("first")
+	d3.selectAll("polygon")
 		.classed("first",false);
 	CELLS[0].d3()
 		.classed("first",true)

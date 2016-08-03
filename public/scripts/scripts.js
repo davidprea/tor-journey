@@ -59,6 +59,7 @@ var highlightRegionID = function( id ) {
 var clearSel = function() {
 	changeSelectionState( d3.selectAll("polygon.hex_cell"), false );
 	d3.selectAll("g.date").remove();
+	d3.selectAll("polygon").classed("first",false);
 }
 
 var gltv = gridLocToVertices;
