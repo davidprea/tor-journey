@@ -1,4 +1,3 @@
-var SELECTED_CELLS = [];
 var hex_offsets = []; // this is ugly
 var CURRENT_MAP = -1;
 

@@ -110,8 +110,8 @@ function changeMap( radioButton ) {
 	CURRENT_MAP = parseInt( radioButton.getAttribute( "map_index"));
 	displayCurrentMap();
 	
-	for(var i=0;i<SELECTED_CELLS.length;i++) {
-		var cell=SELECTED_CELLS[i];
+	for(var i=0;i<CELLS.length;i++) {
+		var cell=CELLS[i];
 		changeSelectionState( cellAtCoords( cell.q, cell.r ), true );
 	}
 	

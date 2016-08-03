@@ -249,37 +249,6 @@ function getSelectedCells() {
 	return d3.selectAll( ".hex_cell.selected");
 }
 
-function dateStringsFromCell( cell ) {
-	var monthNames = [ "January", "February", "March", "April", "May", "June",
-	    "July", "August", "September", "October", "November", "December" ];
-
-	var month = monthNames[ cell.date.getMonth() ].substring(0,3);
-	var day = cell.date.getDate();
-	return month + " " + day;
-	/*
-	var start_month = monthNames[ cell.begin_date.getMonth() ].substring(0,3)
-	var start_day = cell.begin_date.getDate();
-	var end_month = monthNames[ cell.end_date.getMonth() ].substring(0,3)
-	var end_day = cell.end_date.getDate();
-
-	results = [];
-
-	if( start_month != end_month ) {
-		result[0] = start_month + " " + start_day;
-		result[1] = end_month + " " + end_day;
-	} else {
-		if( start_day != end_day ) {
-			result[0] = start_month;
-			result[1] = start_day + " - " + end_day;
-		} else {
-			result[0] = start_month;
-			result[1] = start_day;
-		}
-	}
-	return result;
-	*/
-}
-
 function displayDates( data ) {
 
 	// var first_and_last = [ data[0], data[data.length-1] ];
@@ -323,8 +292,8 @@ function displayDates( data ) {
 		.classed( "cell_date", "true" )
 		.attr("x", 0 ) // function(d) {return cellLocToCenter(d).x; })
 		.attr("y", 3 ) // function(d) {return cellLocToCenter(d).y + 3; })
-		.attr("font-size", function() {return currentMap().scale.y / 2;} )
-		.html( function(d) {return dateStringsFromCell(d);})
+		.attr("font-size", function() {return currentMap().scale.y / 3;} )
+		.html( function(d) {return d.dateString();})
 		.attr("text-anchor","middle");
 
 
@@ -344,16 +313,10 @@ function displayDates( data ) {
 //	s.exit().remove(); 
 }
 
-function fatigueNotationForCell( cell ) {
-	return cell.region.type.tn + "" + (cell.fatigue_checks > 1 ? "x" + cell.fatigue_checks : "" );
-}
 
-function blightNotationForCell( cell ) {
-	return cell.blight_checks;
-}
 
-function addNotation( cells, text_function, params ) {
-		d3.select( "#overlay")
+function addNotation( cells, function_name, params ) {
+	d3.select( "#overlay")
 		.selectAll( "g." + params.class )
 		.remove();
 
@@ -369,7 +332,7 @@ function addNotation( cells, text_function, params ) {
 
 
 	p.append("text")
-		.html(text_function )
+		.html( function(d) {return d[function_name]()} )
 		.attr("fill", params.color )
 		.attr("x", params.x )
 		.attr("y", params.y )
@@ -409,12 +372,12 @@ function numberCells(cells) {
 
 }
 
-function drawJourney( sortedCells ) {
+function drawJourney() {
 	// filters go in defs element
 
 	var data = [];
-	for(var i=0;i<sortedCells.length;i++) {
-		data.push( cellLocToCenter( sortedCells[i] ) );
+	for(var i=0;i<CELLS.length;i++) {
+		data.push( cellLocToCenter( CELLS[i] ) );
 	}
 
 	var lineFunction = d3.svg.line()

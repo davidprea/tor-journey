@@ -11,6 +11,10 @@ get '/' do
 	partial :index
 end
 
+get '/class_test.html' do 
+	partial :classtest
+end
+
 def getRegions
 	results = []
 	file = File.open("regions.tsv","r")

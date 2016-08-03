@@ -1,78 +1,36 @@
 var REGIONS = null;
-var CELLS = [];
+var REGION_GRID = [];
 
-var REGION_TERRAINS =  [{"name":"Easy", "multiplier":1},
-				{"name":"Moderate","multiplier":1.5},
-				{"name":"Hard","multiplier":2},
-				{"name":"Severe","multiplier":3},
-				{"name":"Daunting","multiplier":5},
-				{"name":"Impassable","multiplier":-1}];
+var REGION_TERRAINS =  {"Easy":{"name":"Easy", "multiplier":1},
+				"Moderate":{"name":"Moderate","multiplier":1.5},
+				"Hard":{"name":"Hard","multiplier":2},
+				"Severe":{"name":"Severe","multiplier":3},
+				"Daunting":{"name":"Daunting","multiplier":5},
+				"Impassable":{"name":"Impassable","multiplier":-1}};
 
 
-var REGION_TYPES = [{"name":"Free Lands","tn":12},
-			{"name":"Border Lands","tn":14},
-			{"name":"Wild Lands","blight_freq":7, "tn":16},
-			{"name":"Shadow Lands","blight_freq":1, "tn":18},
-			{"name":"Dark Lands","blight_freq":0.5, "tn":20}];
+var REGION_TYPES = {
+			"Free Lands":{"name":"Free Lands","tn":12},
+			"Border Lands":{"name":"Border Lands","blight_dice":1, "tn":14},
+			"Wild Lands":{"name":"Wild Lands","blight_freq":7, "blight_dice":2, "tn":16},
+			"Shadow Lands":{"name":"Shadow Lands","blight_freq":1, "blight_dice":3, "tn":18},
+			"Dark Lands":{"name":"Dark Lands","blight_freq":0.5, "blight_dice":4, "tn":20}};
 
 
 function loadRegions() {
 	$.get( '/regions.json', function( json ) {
-		REGIONS = JSON.parse(json);
+		region_list = JSON.parse(json);
+		REGIONS = [];
 
-		for(var i=0;i<REGIONS.length;i++) {
-			var region = REGIONS[i];
-			for(var j=0;j<REGION_TERRAINS.length;j++) {
-				t = REGION_TERRAINS[j];
-				if( t.name == region.terrain ) {
-					region.terrain = t;
-				}
-			}
-			for(var j=0;j<REGION_TYPES.length;j++) {
-				t = REGION_TYPES[j];
-				if( t.name == region.type ) {
-					region.type = t;
-				}
-			}		
-			for(var j=0;j<region.cells.length;j++){
-				var cell = region.cells[j];
-				if (CELLS[cell.q] == undefined) {
-					CELLS[cell.q] = [];
-				}
-				
-				if (CELLS[cell.q][cell.r] == undefined ) {
-					CELLS[cell.q][cell.r] = [];
-				}
-				CELLS[cell.q][cell.r].push( region );
-//				cellAtCoords(cell.q,cell.r).classed("valid",true);
-			}
+		for(var i=0;i<region_list.length;i++) {
+			var rdata = region_list[i];
+			var name = rdata.name;
+			var terrain = REGION_TERRAINS[rdata.terrain];
+			var type = REGION_TYPES[rdata.type];
+			var region = new Region(name,i,type,terrain,rdata.cells);
+			REGIONS.push(region);
 		}
 
-//		d3.selectAll("circle.valid")
-//			.style("cursor","pointer");
-
-		// now assign ghostbusters cursor to untagged cells
-
-
-//		me_regions = data.regions;
-//		me_region_table = data.cells;
-
-/*		
-		var image = map_images[MAP];
-		if( typeof image != 'undefined' ) {
-			var map = $("#pdf-canvas")[0];
-			map.style.background = "url('" + image.src + "')";
-			map.style.width = image.width + "px";
-			map.style.height = image.height + "px";
-		}	
-		drawGrid();	
-*/	
-		
-//		console.log( json );
-//		console.log( me_regions );
-//		console.log( me_region_table );
-//		updateIndex();
-//		drawGrid();
 	})
 }
 
@@ -88,11 +46,11 @@ function regionsForCell( q, r ) {
 		}
 	}
 	return result;*/
-	if( CELLS[q] == undefined || 
-		CELLS[q][r] == undefined ) {
+	if( REGION_GRID[q] == undefined || 
+		REGION_GRID[q][r] == undefined ) {
 		return undefined;
 	} else {
-		return CELLS[q][r];
+		return REGION_GRID[q][r];
 	}
 }
 
