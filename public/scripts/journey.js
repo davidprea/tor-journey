@@ -13,15 +13,18 @@ function changeSelectionState( selection, selected ) {
 				cell.classed("selected",selected);
 				changed = true;
 				for(var i=0;i<CELLS.length;i++) {
-					s_cell = CELLS[i];
+					var s_cell = CELLS[i];
 					if( s_cell.q == q && s_cell.r == r ) {
 						index = i;
 					}
 				}
 				if( !selected && index >= 0 ) {
+					CELLS[index].removeAllNeighbors();
 					CELLS.splice(index,1);
 				} else if ( selected && index == -1 ) {
-					CELLS.push( new Cell(q,r,CELLS.length) );
+					var new_cell = new Cell(q,r,CELLS.length);
+					CELLS.push( new_cell );
+					new_cell.findNeighborsIn( CELLS );
 				}
 			}
 
@@ -70,7 +73,7 @@ function sortCells() {
 }
 
 function markFirst() {
-	d3.selectAll("polygon")
+	d3.selectAll("polygons")
 		.classed("first",false);
 	CELLS[0].d3()
 		.classed("first",true)

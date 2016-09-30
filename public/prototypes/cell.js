@@ -11,6 +11,7 @@ function Cell( theQ, theR, i ) {
 	this.arrival_date = null;
 	this.distance = 10;
 	this.speed = 20;
+	this.neighbors = [];
 }
 
 Cell.prototype = {
@@ -53,13 +54,13 @@ Cell.prototype = {
 	},
 
 	neighborsIn: function(pool) {
-		var neighbors = [];
-		for(var i=0;i<pool.length;i++) {
-			if( this.adjacentTo( pool[i] )) {
-				neighbors.push( pool[i] );
+		var result = [];
+		for(var i=0;i<this.neighbors.length;i++) {
+			if( pool.indexOf( this.neighbors[i] ) > -1 ) {
+				result.push( this.neighbors[i] );
 			}
 		}
-		return neighbors;
+		return result;
 	},
 
 
@@ -239,6 +240,36 @@ Cell.prototype = {
 		}
 
 		return this.region;
+	},
+
+	/* neighbor functions */
+	addNeighbor: function( neighbor ) {
+		if( this.neighbors.indexOf( neighbor ) == -1 ) {
+			this.neighbors.push( neighbor );
+			neighbor.addNeighbor( this );
+		}
+	},
+
+	findNeighborsIn: function(pool) {
+		for(var i=0;i<pool.length;i++) {
+			if( this.adjacentTo( pool[i] )) {
+				this.addNeighbor( pool[i] );
+			}
+		}
+	},
+
+	removeNeighbor: function( neighbor ) {
+		var index = this.neighbors.indexOf( neighbor );
+		if( index > -1 ) {
+			this.neighbors.splice( index, 1 );
+			neighbor.remove( this );
+		}
+	},
+
+	removeAllNeighbors: function() {
+		for(var i=0;i<this.neighbors.length;i++) {
+			this.removeNeighbor( this.neighbors[i] );
+		}
 	}
 }
 

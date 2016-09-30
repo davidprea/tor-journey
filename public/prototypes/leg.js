@@ -67,5 +67,20 @@ Leg.prototype = {
     extractAttributes: function() {
         /* this function will have to go through cells, count how many 
         are water, road, etc., and set leg attributes accordingly */
-    }
+    },
+
+    /* UI Stuff */
+    originString: function() {
+        if( cells.length < 1 ) return "no origin";
+        return cells[0].region.name;
+    },
+
+     destinationString: function() {
+        if( cells.length < 1 ) return "no origin";
+        return cells[cells.length - 1].region.name;
+    },
+
+    getTitle: function() {
+        return this.originString() + " to " + this.destinationString();
+    } 
 }
